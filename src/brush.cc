@@ -1,0 +1,28 @@
+#include "tools.hh"
+
+namespace xui
+{
+
+void ToolBrush::onMousePressed(Canvas* canvas, sf::Vector2f pos)
+{
+    is_pressed_ = true;
+    onMouseMoved(canvas, pos);
+}
+
+void ToolBrush::onMouseReleased(Canvas* canvas, sf::Vector2f pos)
+{
+    is_pressed_ = false;
+}
+
+void ToolBrush::onMouseMoved(Canvas* canvas, sf::Vector2f pos)
+{
+    if (is_pressed_)
+        canvas->drawCircle(pos, width_, color_);
+}
+
+void ToolBrush::deactivate()
+{
+    is_pressed_ = false;
+}
+
+} // namespace xui

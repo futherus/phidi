@@ -1,0 +1,9 @@
+{
+    "tools" : {
+        "active_tool" : "ToolBrushPlugin::tool"
+    },
+    "tool_pall" : {},
+    "brush" : {
+        "width" : 1.0
+    }
+}
