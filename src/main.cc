@@ -4,11 +4,15 @@
 #include <cmath>
 #include <random>
 
-#include "button.hh"
-#include "pallette.hh"
+// #include "button.hh"
+// #include "pallette.hh"
 #include "resources.h"
-#include "application.hh"
-#include "tools.hh"
+#include "loader.hh"
+#include "plugin_registry.hh"
+#include "init.hh"
+// #include "tools.hh"
+
+xui::WidgetManager<xui::IWidget> MANAGER{ Rectangle( { 100, 100}, { 800, 800})};
 
 /*
 PushPallette* createToolPallette(Rectangle bounds)
@@ -67,7 +71,6 @@ void addToolBrush(ToolManager* tool_manager, MutexWidgetManager<IWidget>* widget
 }
 */
 
-
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(1600, 1000),
@@ -86,12 +89,12 @@ int main()
     const sf::Texture* pH = gui::TextureFactory::getTexture("pH");
     const sf::Texture* PH = gui::TextureFactory::getTexture("PH");
 
-    xui::PushButton::TexturePack pack{
-        std::array<const sf::Texture*, 2>{ ph, Ph},
-        std::array<const sf::Texture*, 2>{ pH, PH}
-    };
+    // xui::PushButton::TexturePack pack{
+    //     std::array<const sf::Texture*, 2>{ ph, Ph},
+    //     std::array<const sf::Texture*, 2>{ pH, PH}
+    // };
 
-    std::cerr << "loaded textures\n";
+    $M( "Loaded textures\n");
 
 /*
     sf::Clock clock;
@@ -130,27 +133,30 @@ int main()
     Canvas* canvas = new Canvas(Rectangle({300, 300}, {400, 400}), tool_manager);
 
 */
-    // auto button1 = std::make_unique<xui::PushButton>( Rectangle{ { 120, 120}, { 100, 100}}, pack);
-    // std::cerr << "after button1\n";
 
-    // auto button2 = std::make_unique<xui::PushButton>( Rectangle{ { 120, 230}, { 100, 100}}, pack);
-    // std::cerr << "after button2\n";
+#if 0
+    auto button1 = std::make_unique<xui::PushButton>( Rectangle{ { 120, 120}, { 100, 100}}, pack);
+    std::cerr << "after button1\n";
 
-    // auto pallette = std::make_unique<xui::PushPallette>( Rectangle{ { 110, 110}, { 300, 300}});
-    // std::cerr << "after pallette\n";
+    auto button2 = std::make_unique<xui::PushButton>( Rectangle{ { 120, 230}, { 100, 100}}, pack);
+    std::cerr << "after button2\n";
 
-    // pallette->add( button1.get());
-    // pallette->add( button2.get());
-    // std::cerr << "after add buttons\n";
+    auto pallette = std::make_unique<xui::PushPallette>( Rectangle{ { 110, 110}, { 300, 300}});
+    std::cerr << "after pallette\n";
 
-    // auto manager = std::make_unique<xui::WidgetManager<xui::IWidget>>( Rectangle( { 100, 100}, { 800, 800}));
-    // std::cerr << "after manager\n";
+    pallette->add( button1.get());
+    pallette->add( button2.get());
+    std::cerr << "after add buttons\n";
 
-    // manager->add( pallette.get());
-    // std::cerr << "after add pallette\n";
+    auto manager = std::make_unique<xui::WidgetManager<xui::IWidget>>( Rectangle( { 100, 100}, { 800, 800}));
+    std::cerr << "after manager\n";
 
-    // pallette->bind([]( int val){ foo( true, val); });
-    // std::cerr << "after bind\n";
+    manager->add( pallette.get());
+    std::cerr << "after add pallette\n";
+
+    pallette->bind([]( int val){ foo( true, val); });
+    std::cerr << "after bind\n";
+#endif
 
     std::ifstream istr("tmp.json");
     if (!istr.is_open())
@@ -162,31 +168,34 @@ int main()
     gui::json data = gui::json::parse(istr);
     istr.close();
 
-    std::fprintf(stderr, "before plugins init\n");
+    $M( "Before loading plugins\n");
 
-    xui::Application app;
-    xui::ToolsPlugin tools;
-    app.add( &tools);
-    xui::ToolPallettePlugin tool_pall;
-    app.add( &tool_pall);
-    xui::ToolBrushPlugin brush;
-    app.add( &brush);
+    auto* loader = xui::Loader::getLoader();
 
-    std::fprintf( stderr, "before plugins deserialize\n");
+    loader->load( "./bin/tools.so");
+    loader->load( "./bin/tool_pallette.so");
+    loader->load( "./bin/toolbrush.so");
 
-    std::fprintf( stderr, "tools deserialization:\n");
-    tools.deserialize( &app, data["tools"]);
-    std::fprintf( stderr, "tool_pall deserialization:\n");
-    tool_pall.deserialize( &app, data["tool_pall"]);
-    std::fprintf( stderr, "brush deserialization:\n");
-    brush.deserialize( &app, data["brush"]);
+    $M( "All plugins loaded\n");
 
-    std::fprintf( stderr, "after plugins deserialization:\n");
+    $M( "Before deserialization\n");
+    auto* reg = xui::PluginRegistry::getPluginRegistry();
 
+    $M( "tools deserialization:\n");
+    reg->getPlugin( "ToolsPlugin")->deserialize( data["tools"]);
+    $M( "tool_pall deserialization:\n");
+    reg->getPlugin( "ToolPallettePlugin")->deserialize( data["tool_pall"]);
+    $M( "brush deserialization:\n");
+    reg->getPlugin( "ToolBrushPlugin")->deserialize( data["brush"]);
+
+    $M( "All plugins deserialized\n");
+
+#if 0
     auto manager = std::make_unique<xui::WidgetManager<xui::IWidget>>( Rectangle( { 100, 100}, { 800, 800}));
-    std::fprintf( stderr, "after manager\n");
+    $M( "Before manager filling\n");
     manager->add( tool_pall.getToolPallette()->getPallette());
     manager->add( tools.getCanvas());
+#endif
 
     while(window.isOpen())
     {
@@ -205,41 +214,41 @@ int main()
                 {
                     fprintf( stderr, "mouse_pressed\n");
                     sf::Vector2f mouse_pos( event.mouseButton.x, event.mouseButton.y);
-                    if ( manager->contains( mouse_pos))
-                        manager->onMousePressed( event);
+                    if ( MANAGER.contains( mouse_pos))
+                        MANAGER.onMousePressed( event);
 
                     break;
                 }
                 case sf::Event::MouseButtonReleased:
                 {
                     sf::Vector2f mouse_pos( event.mouseButton.x, event.mouseButton.y);
-                    if ( manager->contains( mouse_pos))
-                        manager->onMouseReleased( event);
+                    if ( MANAGER.contains( mouse_pos))
+                        MANAGER.onMouseReleased( event);
 
                     break;
                 }
                 case sf::Event::MouseMoved:
                 {
-                    manager->onMouseMoved( event);
+                    MANAGER.onMouseMoved( event);
 
                     break;
                 }
                 case sf::Event::KeyPressed:
                 {
-                    manager->onKeyPressed( event);
+                    MANAGER.onKeyPressed( event);
 
                     break;
                 }
                 case sf::Event::KeyReleased:
                 {
-                    manager->onKeyReleased( event);
+                    MANAGER.onKeyReleased( event);
 
                     break;
                 }
 
                 case sf::Event::TextEntered:
                 {
-                    manager->onTextEntered( event);
+                    MANAGER.onTextEntered( event);
 
                     break;
                 }
@@ -259,7 +268,7 @@ int main()
 
         // pallette.draw(window);
         // canvas.draw(window);
-        manager->draw( window);
+        MANAGER.draw( window);
         window.display();
     }
 

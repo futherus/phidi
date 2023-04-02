@@ -41,9 +41,9 @@ CXXFLAGS ?= 	   -O2 -g -std=c++14 -fmax-errors=100 -Wall -Wextra   				\
     			#    -fsanitize=vptr                                                 				\
     			#    -lm -pie
 
-SRC 	:= main.cc widget.cc button.cc pallette.cc resources.cc
+SRC 	:= tools.cc
 
-OUT 	:= main.o
+OUT 	:= tools.o
 
 OUT		:= $(OBJDIR)/$(OUT)
 
@@ -58,7 +58,7 @@ $(OUT): $(OBJ) | $(OBJDIR)
 
 $(OBJDIR)/%.tmp.o : %.cc
 	@ echo ======== Compiling $(notdir $@) ========
-	$(CXX) -c $< -o $@ $(CXXFLAGS)
+	$(CXX) -c $< -o $@ -fPIC $(CXXFLAGS)
 # make dependencies
 	@ $(CXX) -MM $< -o $(@:.o=.d) -MT $@ $(CXXFLAGS)
 	@ cp -f $(@:.o=.d) $(@:.o=.d).tmp

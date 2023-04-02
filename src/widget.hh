@@ -20,6 +20,12 @@ private:
 public:
     IWidget( const Rectangle& bounds);
 
+    IWidget( const IWidget&) = delete;
+    IWidget( IWidget&&) = delete;
+    IWidget& operator=( const IWidget&) = delete;
+    IWidget& operator=( IWidget&&) = delete;
+    virtual ~IWidget() = default;
+
     Rectangle bounds() const { return bounds_; }
     bool contains( sf::Vector2f pos) { return bounds_.contains( pos); }
 

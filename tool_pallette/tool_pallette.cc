@@ -1,7 +1,10 @@
-#include "tools.hh"
+#include "tool_pallette.hh"
 
 namespace xui
 {
+
+const int ToolPallettePlugin::ID = 0;
+static RegisterPlugin<xui::ToolPallettePlugin> X{ "ToolPallettePlugin"};
 
 void ToolPallette::update()
 {
@@ -26,4 +29,4 @@ void ToolPallette::add( std::string tool_id, PushButton* button)
     pallette_.add( button);
 }
 
-} // namespace xui
+}

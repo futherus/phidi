@@ -44,20 +44,25 @@ export CXXFLAGS ?=  -O2 -g -std=c++14 -fmax-errors=100 -Wall -Wextra  	    \
 
 # not overwrite DESTDIR if recursive
 export DESTDIR ?= $(CURDIR)/bin
-TARGET         := $(DESTDIR)/out
-
 export OBJDIR  := $(CURDIR)/obj
-OBJ            := main.o
-
-LIB            := sfml-graphics sfml-window sfml-system fmt
 
 #------------------------------------------------------------------------------
-all: build
+all: out toolbrush.so tool_pallette.so tools.so
 
-build: | $(OBJDIR) $(DESTDIR)
+out: | $(OBJDIR) $(DESTDIR)
 	@ cd src && $(MAKE)
 	@ echo ======== Linking $(notdir $@) ========
-	@ $(CXX) $(addprefix $(OBJDIR)/, $(OBJ)) $(addprefix -l, $(LIB)) -o $(TARGET) $(CXXFLAGS)
+	@ $(CXX) $(addprefix $(OBJDIR)/, main.o) \
+			 $(addprefix -l, sfml-graphics sfml-window sfml-system fmt) \
+			 -o $(DESTDIR)/$@ -rdynamic $(CXXFLAGS)
+
+%.so: | $(OBJDIR) $(DESTDIR)
+	@ cd $(basename $@) && $(MAKE)
+	@ echo ======== Linking $(notdir $@) ========
+	@ $(CXX) $(addprefix $(OBJDIR)/, $(basename $@).o) \
+			 $(addprefix -l, sfml-graphics sfml-window sfml-system fmt) \
+			 -shared -fPIC \
+			 -o $(DESTDIR)/$@ $(CXXFLAGS)
 
 clean:
 	rm -rf $(OBJDIR)

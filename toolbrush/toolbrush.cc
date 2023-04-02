@@ -1,4 +1,4 @@
-#include "tools.hh"
+#include "toolbrush.hh"
 
 namespace xui
 {
@@ -25,4 +25,17 @@ void ToolBrush::deactivate()
     is_pressed_ = false;
 }
 
+const int ToolBrushPlugin::ID = 0;
+static RegisterPlugin<xui::ToolBrushPlugin> X{ "ToolBrushPlugin"};
+
 } // namespace xui
+
+#if 0
+extern "C" xui::IPlugin* getPlugin()
+{
+    static xui::ToolBrushPlugin plugin;
+
+    $D("Plugin id = %s\n", plugin.getId().data());
+    return &plugin;
+}
+#endif

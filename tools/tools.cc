@@ -1,7 +1,47 @@
 #include "tools.hh"
 
+
 namespace xui
 {
+
+const int ToolsPlugin::ID = 0;
+static RegisterPlugin<xui::ToolsPlugin> X{ "ToolsPlugin"};
+
+void ToolManager::updateViews()
+{
+    for (auto v : views_)
+        v->update();
+}
+
+void ToolManager::setActive( const std::string& id)
+{
+    // FIXME: is available?
+    active_tool_ = id;
+}
+
+const std::string& ToolManager::getActive() const
+{
+    return active_tool_;
+}
+
+void ToolManager::addTool( ITool* tool)
+{
+    // FIXME: update views or leave it on them?
+    tools_.push_back( tool);
+}
+
+ITool* ToolManager::getActiveTool() const
+{
+    // FIXME: store pointer to active tool instead string
+    std::cerr << "active_tool_ = " << active_tool_ << std::endl;
+
+    for (auto t : tools_)
+        if (t->getId() == active_tool_)
+            return t;
+
+    assert(0 && "Tool was not found");
+}
+
 
 // void Canvas::drawCircle( sf::Vector2f pos, float radius, sf::Color color);
 // void Canvas::drawLine( sf::Vector2f pos1, sf::Vector2f pos2, float width, sf::Color color);
@@ -78,6 +118,9 @@ void Canvas::onMouseReleased(const sf::Event& event)
 void Canvas::onMouseMoved(const sf::Event& event)
 {
     sf::Vector2f pos = {event.mouseMove.x, event.mouseMove.y};
+    if (!contains( pos))
+        return;
+
     tool_manager_->getActiveTool()->onMouseMoved(this, pos - bounds().tl());
 }
 
