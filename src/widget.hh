@@ -2,7 +2,7 @@
 #define WIDGET_HH
 
 #include <SFML/Graphics.hpp>
-#include "rectangle.h"
+#include "rectangle.hh"
 
 namespace xui
 {
