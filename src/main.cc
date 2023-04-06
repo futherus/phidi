@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cmath>
 #include <random>
+#include <fstream>
 
 // #include "button.hh"
 // #include "pallette.hh"
@@ -165,7 +166,7 @@ int main()
         return 1;
     }
 
-    gui::json data = gui::json::parse(istr);
+    xui::json data = xui::json::parse(istr);
     istr.close();
 
     $M( "Before loading plugins\n");

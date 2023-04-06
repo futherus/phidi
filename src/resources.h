@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <map>
 #include <string>
-#include "serialize.h"
+#include <memory>
 
 namespace gui
 {

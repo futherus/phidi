@@ -5,7 +5,6 @@
 #include <array>
 #include <functional>
 // #include "bind.hh"
-#include "texture.h"
 #include "widget.hh"
 
 namespace xui
