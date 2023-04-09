@@ -10,12 +10,6 @@ namespace xui
 class ToolBrush
     : public ITool
 {
-private:
-    float width_;
-    sf::Color color_;
-
-    bool is_pressed_;
-
 public:
     ToolBrush( std::string id)
         : ITool{ id}
@@ -34,16 +28,17 @@ public:
     void onMouseMoved   ( Canvas* canvas, sf::Vector2f pos) override;
 
     void deactivate() override;
+
+private:
+    float width_;
+    sf::Color color_;
+
+    bool is_pressed_;
 };
 
 class ToolBrushPlugin
     : public IPlugin
 {
-private:
-
-    ToolBrush* tool_;
-    PushButton* tool_button_;
-
 public:
     static const int ID;
 
@@ -61,12 +56,12 @@ public:
         tool_->setColor( sf::Color::Red);
         tool_->setWidth( state["width"]);
 
-        std::fprintf( stderr, "before adding tool\n");
-        auto tl_mngr_plg = PluginRegistry::getPluginRegistry()->getPlugin<ToolsPlugin>();
+        $D( "before adding tool\n");
+        auto tl_mngr_plg = PluginRegistry::instance()->getPlugin<ToolsPlugin>();
         auto tl_mngr = tl_mngr_plg->getToolManager();
         tl_mngr->addTool( tool_);
 
-        std::fprintf( stderr, "before creating button\n");
+        $D( "before creating button\n");
         const sf::Texture* ph = gui::TextureFactory::getTexture("ph");
         const sf::Texture* Ph = gui::TextureFactory::getTexture("Ph");
         const sf::Texture* pH = gui::TextureFactory::getTexture("pH");
@@ -82,13 +77,13 @@ public:
             std::move( pack)
         };
 
-        std::fprintf( stderr, "before getting tool_pall plugin\n");
-        auto tl_pal_plg = PluginRegistry::getPluginRegistry()->getPlugin<ToolPallettePlugin>();
-        std::fprintf( stderr, "before getting tool_pall\n");
+        $D ( "before getting tool_pall plugin\n");
+        auto tl_pal_plg = PluginRegistry::instance()->getPlugin<ToolPallettePlugin>();
+        $D ( "before getting tool_pall\n");
         auto tl_pal = tl_pal_plg->getToolPallette();
-        std::fprintf( stderr, "before adding button\n");
+        $D ( "before adding button\n");
         tl_pal->add( "ToolBrushPlugin::tool", tool_button_);
-        std::fprintf( stderr, "after adding button\n");
+        $D ( "after adding button\n");
     }
 
     void serialize( json& state) override
@@ -96,6 +91,10 @@ public:
         // state["color"] = tool_->getColor();
         state["width"] = tool_->getWidth();
     }
+
+private:
+    ToolBrush* tool_;
+    PushButton* tool_button_;
 };
 
 } // namespace xui

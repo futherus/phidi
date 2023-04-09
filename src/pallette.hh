@@ -13,7 +13,7 @@ class PushPallette
     : public WidgetManager<PushButton>
 {
     // std::unique_ptr<xui::IBind<int>> on_change_;
-    std::function<void(int)> on_change_;
+    std::function<void( int)> on_change_;
     int active_button_;
 
     // gui::BorderTexture* texture_;
@@ -32,7 +32,7 @@ public:
     //     on_change_ = std::make_unique<xui::Bind<TObject, int, TExtraArg>>( object, method, targ);
     // }
 
-    void bind( std::function<void(int)>&& func);
+    void bind( std::function<void( int)>&& func);
     void add( PushButton* button);
 
     void update( int new_state);

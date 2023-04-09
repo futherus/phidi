@@ -5,11 +5,10 @@
 #include <cassert>
 #include <SFML/Graphics.hpp>
 
-#include "../src/bind.hh"
 #include "../src/pallette.hh"
 #include "../src/plugin_registry.hh"
 #include "../src/resources.h"
-#include "../src/init.hh"
+#include "../init/init.hh"
 
 namespace xui
 {
@@ -126,7 +125,7 @@ public:
         , tool_manager_{ new ToolManager}
         , canvas_{ new Canvas}
     {
-        MANAGER.add( canvas_);
+        PluginRegistry::instance()->getPlugin<InitPlugin>()->add( canvas_);
     }
 
     ~ToolsPlugin() = default;

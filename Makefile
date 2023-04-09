@@ -1,7 +1,7 @@
 export CXX      := g++
-export CXXFLAGS ?=  -O2 -g -std=c++14 -fmax-errors=100 -Wall -Wextra  	    \
-				-Weffc++ -Waggressive-loop-optimizations -Wc++0x-compat 	   					\
-				-Wc++11-compat -Wc++14-compat -Wcast-align -Wcast-qual 	   					\
+export CXXFLAGS ?=  -O2 -g -std=c++17 -fmax-errors=100 -Wall -Wextra  	    \
+				-Weffc++ -Waggressive-loop-optimizations 	   					\
+				-Wcast-align -Wcast-qual 	   					\
 				-Wchar-subscripts -Wconditionally-supported -Wconversion        				\
 				-Wctor-dtor-privacy -Wempty-body -Wfloat-equal 		   						\
 				-Wformat-nonliteral -Wformat-security -Wformat-signedness       				\
@@ -47,7 +47,7 @@ export DESTDIR ?= $(CURDIR)/bin
 export OBJDIR  := $(CURDIR)/obj
 
 #------------------------------------------------------------------------------
-all: out toolbrush.so tool_pallette.so tools.so
+all: out init.so toolbrush.so tool_pallette.so tools.so
 
 out: | $(OBJDIR) $(DESTDIR)
 	@ cd src && $(MAKE)

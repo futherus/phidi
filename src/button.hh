@@ -17,7 +17,7 @@ public:
     using TexturePack = std::array<std::array<const sf::Texture*, 2>, 2>;
 
 private:
-    std::function<void(bool)> on_click_;    
+    std::function<void( bool)> on_click_;
 
     TexturePack textures_;
     sf::Sprite sprite_;
@@ -39,7 +39,7 @@ public:
     //     on_click_ = std::make_unique<xui::Bind<TObject, bool, TExtraArg>>( object, method, extra_arg);
     // }
 
-    void bind(std::function<void(bool)>&& func);
+    void bind( std::function<void( bool)>&& func);
 
     void update( bool new_state);
     void onMousePressed( const sf::Event&) override;

@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "rectangle.hh"
+#include "debug.hh"
 
 namespace xui
 {
