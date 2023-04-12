@@ -41,41 +41,44 @@ export CXXFLAGS ?=  -O2 -g -std=c++17 -fmax-errors=100 -Wall -Wextra  	    \
 				# -fsanitize=vptr                                                 				\
 				# -fPIE                                                           				\
 				# -lm -pie
+# Make shure to define rule for each target
+SHELL := bash
 
-# not overwrite DESTDIR if recursive
-export DESTDIR ?= $(CURDIR)/bin
-export OBJDIR  := $(CURDIR)/obj
+CXX := g++
+CXXFLAGS := -Wall
+include txx.mk
 
-#------------------------------------------------------------------------------
 all: out init.so toolbrush.so tool_pallette.so tools.so
+# Libraries and headers
+LIBS := sfml-system sfml-window sfml-graphics
+INCLUDE := libs
+>>>>>>> Stashed changes
 
-out: | $(OBJDIR) $(DESTDIR)
-	@ cd src && $(MAKE)
-	@ echo ======== Linking $(notdir $@) ========
-	@ $(CXX) $(addprefix $(OBJDIR)/, main.o) \
-			 $(addprefix -l, sfml-graphics sfml-window sfml-system fmt) \
-			 -o $(DESTDIR)/$@ -rdynamic $(CXXFLAGS)
+# Determine the object files
+OBJ :=
 
-%.so: | $(OBJDIR) $(DESTDIR)
-	@ cd $(basename $@) && $(MAKE)
-	@ echo ======== Linking $(notdir $@) ========
-	@ $(CXX) $(addprefix $(OBJDIR)/, $(basename $@).o) \
-			 $(addprefix -l, sfml-graphics sfml-window sfml-system fmt) \
-			 -shared -fPIC \
-			 -o $(DESTDIR)/$@ $(CXXFLAGS)
+# Use submodules instead of recursion
+MODULES := lot
+# Include the description for each module
+include $(patsubst %, %/module.mk, $(MODULES))
+
+LDFLAGS  += $(addprefix -l, $(LIBS))
+CXXFLAGS += $(addprefix -I, $(INCLUDE))
+
+# Target specific object files
+lot: $(OBJ) lot/main.o
+	$(CXX) -o lot.exe lot/main.o $(CXXFLAGS) $(LDFLAGS)
 
 clean:
-	rm -rf $(OBJDIR)
+	rm -f $(TARGETS)
+	rm -rf $(addsuffix /*.o, $(MODULES))
+	rm -rf $(addsuffix /*.d, $(MODULES))
 
-distclean:
-	rm -rf $(OBJDIR) $(DESTDIR)
+.PHONY: clean $(TARGETS)
 
-#------------------------------------------------------------------------------
+# Dependencies
+include $(OBJ:.o=.d)
 
-$(OBJDIR):
-	mkdir $(OBJDIR)
+%.d: %.cc
+	./depend.sh `dirname $*` $(CXXFLAGS) $< > $@
 
-$(DESTDIR):
-	mkdir $(DESTDIR)
-
-.PHONY: all build clean distclean
