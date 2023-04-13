@@ -7,41 +7,109 @@
 namespace xui
 {
 
-struct PushPalletteImpl final
+class BoolControlRef final
 {
-    PushPalletteImpl( int padding)
+public:
+
+    // Marking constructor explicit because...
+    template <typename BoolControlT>
+    explicit BoolControlRef( BoolControlT& control)
+        : control_{ std::addressof( control)}
+        , layout_{ []( void* ctl, const Constraints& cons)
+            {$FUNC
+                auto* tmp = static_cast<const BoolControlT*>( ctl);
+                return Layout( *tmp, cons); // ...this Layout() casts to BoolControlT somehow calls...
+            }}
+        , update_{ []( void* ctl, bool val)
+            {
+                auto* tmp = static_cast<BoolControlT*>( ctl);
+                tmp->update( val);
+            }}
+        , bind_{ []( void* ctl, std::function<void( bool)>&& on_change)
+            {
+                auto* tmp = static_cast<BoolControlT*>( ctl);
+                tmp->bind( std::move( on_change));
+            }}
+        , is_pushed_{ []( void* ctl)
+            {
+                auto* tmp = static_cast<const BoolControlT*>( ctl);
+                return tmp->isPushed();
+            }}
+    {}
+
+    void update( bool val)
+    {
+        update_( control_, val);
+    }
+
+    void bind( std::function<void( bool)>&& on_click)
+    {
+        bind_( control_, std::move( on_click));
+    }
+
+    bool isPushed() const
+    {
+        return is_pushed_( control_);
+    }
+
+    // ...this Layout().
+    // We need to understand what is going on.
+    // And why this does not happen to Widget::Layout()
+    friend LayoutObject Layout( const BoolControlRef& control, const Constraints& cons)
+    {$FUNC
+        return control.layout_( control.control_, cons);
+    }
+
+    // using This = void*;
+    using LayoutOp = LayoutObject( void*, const Constraints& cons);
+    using UpdateOp = void( void*, bool);
+    using BindOp = void( void*, std::function<void( bool)>&&);
+    using IsPushedOp = bool( void*);
+
+private:
+    void* control_;
+
+    LayoutOp* layout_;
+    UpdateOp* update_;
+    BindOp* bind_;
+    IsPushedOp* is_pushed_;
+};
+
+class PushPallette final
+{
+public:
+    PushPallette( int padding)
         : column_{ padding}
         , on_change_{}
         , active_button_{}
     {}
 
-    ColumnImpl<PushButton> column_;
-    std::function<void( int)> on_change_;
-    int active_button_;
-};
-
-class PushPallette final
-    : public Impl<PushPalletteImpl>
-{
-public:
-    using Impl::Impl;
+    PushPallette( const PushPallette&) = delete;
+    PushPallette& operator=( const PushPallette&) = delete;
+    PushPallette( PushPallette&&) = delete;
+    PushPallette& operator=( PushPallette&&) = delete;
 
     void bind( std::function<void( int)>&& func)
     {
-        impl().on_change_ = std::move( func);
+        on_change_ = std::move( func);
     }
 
-    void add( PushButton button);
+    void add( BoolControlRef button);
 
     void update( int new_state);
     void onChange( bool new_state, int index);
 
-    // const Column<PushButton> getColumn() const { return &impl().column_; }
-    Column<PushButton> getColumn() { return &impl().column_; }
+    const Column<BoolControlRef>& getColumn() const { return column_; }
+          Column<BoolControlRef>& getColumn()       { return column_; }
+
+private:
+    Column<BoolControlRef> column_;
+    std::function<void( int)> on_change_;
+    int active_button_;
 };
 
-void Render( PushPallette pallette, const Geometry& geometry, sf::RenderTarget& target);
+void Render( const PushPallette& pallette, const Geometry& geometry, sf::RenderTarget& target);
 
-LayoutObject Layout( PushPallette pallette, const Constraints& cons);
+LayoutObject Layout( const PushPallette& pallette, const Constraints& cons);
 
 } // namespace xui

@@ -23,8 +23,8 @@ namespace xui
 // }
 
 void
-Render( PushButton button,
-        const Geometry& geometry, 
+Render( const PushButton& button,
+        const Geometry& geometry,
         sf::RenderTarget& target)
 {
     $M( "Render: Pointer to button: %p\n", &button);
@@ -42,12 +42,12 @@ Render( PushButton button,
 }
 
 LayoutObject
-Layout( PushButton button,
+Layout( const PushButton& button,
         const Constraints& cons)
 {$FUNC
     assert( cons >= button.getSize());
 
-    $M( "Layout: Pointer to button: %p\n", button.address());
+    // $M( "Layout: Pointer to button: %p\n", button.address());
     LayoutObject object = LayoutObject{ button, {{}, button.getSize()}};
     $M( "returning PushButton (%f, %f) (%f, %f)\n", object.getPosition().x, object.getPosition().y, object.getSize().x, object.getSize().y);
     return object;

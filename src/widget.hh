@@ -6,6 +6,75 @@
 namespace xui
 {
 
+// 0)
+// WidgetPtr
+// Button*
+
+// 1)
+// Widget
+// WidgetPtr<Button>
+
+// 2)
+// WidgetRef
+// Button&
+
+// template <typename isConst>
+
+class WidgetRef final
+{
+public:
+    template<typename WidgetT>
+    WidgetRef( WidgetT& widget)
+        : widget_{ std::addressof( widget) }
+        , layout_{ []( void* widgetBytes, const Constraints& cons)
+            {$FUNC
+                auto* tmp = static_cast<WidgetT*>( widgetBytes);
+                return Layout( *tmp, cons);
+            }
+          }
+    {}
+
+    friend LayoutObject Layout( const WidgetRef& widget, const Constraints& cons)
+    {$FUNC
+        return widget.layout_( widget.widget_, cons);
+    }
+
+private:
+    using LayoutOperation = LayoutObject( void*, const Constraints& cons);
+
+    void* widget_;
+    LayoutOperation* layout_;
+};
+
+#if 0
+class WidgetConstRef final
+{
+public:
+    template<typename WidgetT>
+    WidgetConstRef( const WidgetT& widget)
+        : widget_{ std::addressof( widget) }
+        , layout_{ []( const void* widgetBytes, const Constraints& cons)
+            {
+                auto* tmp = static_cast<const WidgetT*>( widgetBytes);
+                return Layout( *tmp, cons);
+            }
+          }
+    {}
+
+    friend LayoutObject Layout( const WidgetConstRef& widget, const Constraints& cons)
+    {
+        return widget.layout_( widget.widget_, cons);
+    }
+
+private:
+    using LayoutOperation = LayoutObject( const void*, const Constraints& cons);
+
+    const void* widget_;
+    LayoutOperation* layout_;
+};
+#endif
+
+#if 0
 class Widget final
 {
 public:
@@ -84,6 +153,9 @@ public:
 private:
     std::unique_ptr<WidgetConcept> impl_;
 };
+#endif
+
+#if 0
 
 template <typename T>
 class Impl
@@ -119,5 +191,7 @@ protected:
 private:
     T* impl_;
 };
+#endif
+
 
 } // namespace xui

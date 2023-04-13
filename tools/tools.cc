@@ -55,14 +55,14 @@ ITool* ToolManager::getActiveTool() const
 
 void Canvas::clear()
 {
-    impl().is_pressed_ = false;
+    is_pressed_ = false;
 
-    sf::RectangleShape rect{ impl().size_};
-    rect.setFillColor( impl().base_color_);
+    sf::RectangleShape rect{ size_};
+    rect.setFillColor( base_color_);
 
-    impl().pixels_.draw( rect);
+    pixels_.draw( rect);
 
-    impl().pixels_.display();
+    pixels_.display();
 }
 
 void Canvas::drawCircle( sf::Vector2f pos, float radius, sf::Color color)
@@ -71,9 +71,9 @@ void Canvas::drawCircle( sf::Vector2f pos, float radius, sf::Color color)
     circ.setPosition( pos);
     circ.setOrigin( {radius, radius});
     circ.setFillColor( color);
-    impl().pixels_.draw( circ);
+    pixels_.draw( circ);
 
-    impl().pixels_.display();
+    pixels_.display();
 }
 
 void Canvas::drawLine( sf::Vector2f pos1, sf::Vector2f pos2, float width, sf::Color color)
@@ -81,9 +81,9 @@ void Canvas::drawLine( sf::Vector2f pos1, sf::Vector2f pos2, float width, sf::Co
     sf::Vertex line[] = { sf::Vertex(pos1), sf::Vertex(pos2) };
     line[0].color = color;
     line[1].color = color;
-    impl().pixels_.draw( line, 2, sf::Lines);
+    pixels_.draw( line, 2, sf::Lines);
 
-    impl().pixels_.display();
+    pixels_.display();
 }
 
 // void Canvas::draw( sf::RenderTarget& target) const
@@ -98,7 +98,7 @@ void Canvas::drawLine( sf::Vector2f pos1, sf::Vector2f pos2, float width, sf::Co
 // }
 
 void
-Render( Canvas canvas,
+Render( const Canvas& canvas,
         const Geometry& geometry, 
         sf::RenderTarget& target)
 {
@@ -110,13 +110,15 @@ Render( Canvas canvas,
 }
 
 LayoutObject
-Layout( Canvas canvas,
+Layout( const Canvas& canvas,
         const Constraints& cons)
 {$FUNC
     assert( cons >= canvas.getSize());
     $D( "Canvas size in layout: (%f, %f)\n", canvas.getSize().x, canvas.getSize().y);
 
-    return LayoutObject{ canvas, {{}, canvas.getSize()}};
+    LayoutObject object = LayoutObject{ canvas, {{}, canvas.getSize()}};
+    $M( "returning Canvas (%f, %f) (%f, %f)\n", object.getPosition().x, object.getPosition().y, object.getSize().x, object.getSize().y);
+    return object;
 }
 
 // void Canvas::onMousePressed( const sf::Event& event)

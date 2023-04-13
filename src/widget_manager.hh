@@ -7,35 +7,35 @@
 namespace xui
 {
 
-struct WidgetManagerImpl
+class WidgetManager
 {
-    WidgetManagerImpl( sf::Vector2f size)
+public:
+    WidgetManager( sf::Vector2f size)
         : size_{ size}
     {}
 
+    WidgetManager( const WidgetManager&) = delete;
+    WidgetManager& operator=( const WidgetManager&) = delete;
+    WidgetManager( WidgetManager&&) = delete;
+    WidgetManager& operator=( WidgetManager&&) = delete;
+
+    sf::Vector2f getSize() const { return size_; }
+    const std::vector<WidgetRef>& getWidgets() const { return widgets_; }
+          std::vector<WidgetRef>& getWidgets()       { return widgets_; }
+
+private:
     sf::Vector2f size_;
-    std::vector<Widget> widgets_;
-};
-
-class WidgetManager
-    : public Impl<WidgetManagerImpl>
-{
-public:
-    using Impl<WidgetManagerImpl>::Impl;
-
-    sf::Vector2f getSize() const { return impl().size_; }
-    const std::vector<Widget>& getWidgets() const { return impl().widgets_; }
-    std::vector<Widget>& getWidgets() { return impl().widgets_; }
+    std::vector<WidgetRef> widgets_;
 };
 
 inline void
-Render( WidgetManager,
+Render( const WidgetManager&,
         const Geometry&,
         sf::RenderTarget&)
 {}
 
 inline LayoutObject
-Layout( WidgetManager manager,
+Layout( const WidgetManager& manager,
         const Constraints& cons)
 {$FUNC
     LayoutObject object{ manager, manager.getWidgets().size()};

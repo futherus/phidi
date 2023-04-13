@@ -20,20 +20,21 @@ public:
     {
         tool_manager_ = tool_manager;
 
-        getPallette().bind(
+        pallette_.bind(
             [&]( int indx){ tool_manager_->setActive( tool_ids_.find( indx)->second); }
         );
     }
 
     void update() override;
 
-    void add( std::string tool_id, PushButton button);
+    void add( std::string tool_id, PushButton& button);
 
-    PushPallette getPallette() { return &pallette_; }
+    const PushPallette& getPallette() const { return pallette_; }
+          PushPallette& getPallette()       { return pallette_; }
 
 private:
     ToolManager* tool_manager_;
-    PushPalletteImpl pallette_;
+    PushPallette pallette_;
 
     std::map<int, std::string> tool_ids_;
 };

@@ -13,16 +13,16 @@ class InitPlugin final
     : public IPlugin
 {
 private:
-    std::unique_ptr<ColumnImpl<Widget>> manager_;
+    std::unique_ptr<Column<WidgetRef>> manager_;
 
 public:
     static const int ID;
 
     InitPlugin()
         : IPlugin{}
-        , manager_{ std::make_unique<ColumnImpl<Widget>>( 10)}
+        , manager_{ std::make_unique<Column<WidgetRef>>( 10)}
     {
-        gRootWidget.getWidgets().push_back( Column<Widget>( manager_.get()));
+        gRootWidget->getWidgets().push_back( *manager_);
     }
 
     ~InitPlugin() = default;
@@ -35,11 +35,10 @@ public:
 
     void serialize( json&) override {}
 
-    void add( Widget widget)
+    void add( WidgetRef widget)
     {
         // FIXME: Find in serialization.
-        Column<Widget> mngr{ manager_.get()};
-        mngr.getWidgets().push_back( std::move( widget));
+        manager_->getWidgets().push_back( std::move( widget));
     }
 };
 

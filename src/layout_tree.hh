@@ -62,7 +62,7 @@ private:
         : public LayoutObjectConcept
     {
     public:
-        LayoutObjectModel( T widget)
+        LayoutObjectModel( const T& widget)
             : widget_{ widget}
         {}
 
@@ -83,7 +83,7 @@ private:
         }
 
     private:
-        T widget_;
+        const T& widget_;
     };
 
 public:

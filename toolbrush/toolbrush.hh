@@ -76,16 +76,16 @@ public:
             std::array<const sf::Texture*, 2>{ pH, PH}
         };
 
-        tool_button1_ = std::make_unique<PushButtonImpl>( pack, sf::Vector2f{ 100, 100});
-        tool_button2_ = std::make_unique<PushButtonImpl>( std::move( pack), sf::Vector2f{ 100, 100});
+        tool_button1_ = std::make_unique<PushButton>( pack, sf::Vector2f{ 100, 100});
+        tool_button2_ = std::make_unique<PushButton>( std::move( pack), sf::Vector2f{ 100, 100});
 
         $D ( "before getting tool_pall plugin\n");
         auto tl_pal_plg = PluginRegistry::instance()->getPlugin<ToolPallettePlugin>();
         $D ( "before getting tool_pall\n");
         auto tl_pal = tl_pal_plg->getToolPallette();
         $D ( "before adding button\n");
-        tl_pal->add( "ToolBrushPlugin::tool1", tool_button1_.get());
-        tl_pal->add( "ToolBrushPlugin::tool2", tool_button1_.get());
+        tl_pal->add( "ToolBrushPlugin::tool1", *tool_button1_);
+        tl_pal->add( "ToolBrushPlugin::tool2", *tool_button1_);
         $D ( "after adding button\n");
     }
 
@@ -98,8 +98,8 @@ public:
 private:
     std::unique_ptr<ToolBrush> tool1_;
     std::unique_ptr<ToolBrush> tool2_;
-    std::unique_ptr<PushButtonImpl> tool_button1_;
-    std::unique_ptr<PushButtonImpl> tool_button2_;
+    std::unique_ptr<PushButton> tool_button1_;
+    std::unique_ptr<PushButton> tool_button2_;
 };
 
 } // namespace xui

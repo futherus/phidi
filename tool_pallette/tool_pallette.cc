@@ -20,13 +20,13 @@ void ToolPallette::update()
     }
 }
 
-void ToolPallette::add( std::string tool_id, PushButton button)
+void ToolPallette::add( std::string tool_id, PushButton& button)
 {
     // FIXME: button ordering is fixed
     $D( "before inserting index pair\n");
     tool_ids_.insert( std::pair<int, std::string>{ getPallette().getColumn().getWidgets().size(), std::move( tool_id)});
 
-    getPallette().add( button);
+    getPallette().add( BoolControlRef{ button});
 }
 
-}
+} // namespace xui

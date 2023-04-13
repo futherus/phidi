@@ -6,49 +6,45 @@ namespace xui
 {
 
 template<typename T>
-struct ColumnImpl final
+class Column final
 {
-    ColumnImpl( int padding)
+public:
+    Column( int padding)
         : padding_{ padding}
         , widgets_{}
     {}
+    Column( const Column&) = delete;
+    Column& operator=( const Column&) = delete;
+    Column( Column&&) = delete;
+    Column& operator=( Column&&) = delete;
 
+    int getPadding() const { return padding_; }
+    const std::vector<T>& getWidgets() const { return widgets_; }
+    std::vector<T>& getWidgets() { return widgets_; }
+    void add( T widget) { widgets_.push_back( widget); }
+
+private:
     int padding_;
     std::vector<T> widgets_;
 };
 
 template<typename T>
-class Column final
-    : public Impl<ColumnImpl<T>>
-{
-public:
-    using Impl<ColumnImpl<T>>::Impl;
-    using Impl<ColumnImpl<T>>::impl;
-    //        ^^^^^^^^^^^^^^^ This is mandatory
-
-    int getPadding() const { return impl().padding_; }
-    const std::vector<T>& getWidgets() const { return impl().widgets_; }
-    std::vector<T>& getWidgets() { return impl().widgets_; }
-    void add( T widget) { impl().widgets_.push_back( widget); }
-};
-
-template<typename T>
 inline void
-Render( Column<T>,
+Render( const Column<T>&,
         const Geometry&,
         sf::RenderTarget&)
 {}
 
 template<typename T>
 inline LayoutObject
-Layout( Column<T> column,
+Layout( const Column<T>& column,
         const Constraints& cons)
 {$FUNC
     LayoutObject object{ column, column.getWidgets().size()};
 
     Constraints space_left{ sf::Vector2f(cons) - sf::Vector2f{0, 2 * column.getPadding()}};
     sf::Vector2f position{ 0, column.getPadding()};
-    for ( auto& widget : column.getWidgets() )
+    for ( const T& widget : column.getWidgets() )
     {
         $$
         LayoutObject child = Layout( widget, space_left);

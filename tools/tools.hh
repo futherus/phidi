@@ -64,9 +64,10 @@ public:
     ITool* getActiveTool() const;
 };
 
-struct CanvasImpl final
+class Canvas final
 {
-    CanvasImpl()
+public:
+    Canvas()
         : size_{ 300, 300}
         , tool_manager_{}
         , pixels_{}
@@ -76,6 +77,38 @@ struct CanvasImpl final
         , is_active_{}
     {}
 
+    Canvas( const Canvas&) = delete;
+    Canvas& operator=( const Canvas&) = delete;
+    Canvas( Canvas&&) = delete;
+    Canvas& operator=( Canvas&&) = delete;
+
+
+    void init()
+    {
+        pixels_.create( size_.x, size_.y);
+        // sprite_.setTexture( pixels_.getTexture());
+        // sprite_.setPosition( bounds().tl());
+        clear();
+    }
+
+    void setToolManager( ToolManager* tool_manager) { tool_manager_ = tool_manager; }
+    void setBaseColor( sf::Color color) { base_color_ = color; }
+
+    sf::Color getBaseColor() const { return base_color_; }
+    sf::Vector2f getSize() const { return size_; }
+    const sf::RenderTexture* getRenderTexture() const { return &pixels_; }
+
+    void clear();
+    void drawCircle( sf::Vector2f pos, float radius, sf::Color color);
+    void drawLine( sf::Vector2f pos1, sf::Vector2f pos2, float width, sf::Color color);
+
+    // void draw( sf::RenderTarget& target) const override;
+
+    // void onMousePressed ( const sf::Event& event) override;
+    // void onMouseReleased( const sf::Event& event) override;
+    // void onMouseMoved   ( const sf::Event& event) override;
+
+private:
     sf::Vector2f size_;
     ToolManager* tool_manager_;
 
@@ -88,41 +121,9 @@ struct CanvasImpl final
 
 };
 
-class Canvas final
-    : public Impl<CanvasImpl>
-{
-public:
-    using Impl::Impl;
 
-    void init()
-    {
-        impl().pixels_.create( impl().size_.x, impl().size_.y);
-        // sprite_.setTexture( pixels_.getTexture());
-        // sprite_.setPosition( bounds().tl());
-        clear();
-    }
-
-    void setToolManager( ToolManager* tool_manager) { impl().tool_manager_ = tool_manager; }
-    void setBaseColor( sf::Color color) { impl().base_color_ = color; }
-
-    sf::Color getBaseColor() const { return impl().base_color_; }
-    sf::Vector2f getSize() const { return impl().size_; }
-    const sf::RenderTexture* getRenderTexture() const { return &impl().pixels_; }
-
-    void clear();
-    void drawCircle( sf::Vector2f pos, float radius, sf::Color color);
-    void drawLine( sf::Vector2f pos1, sf::Vector2f pos2, float width, sf::Color color);
-
-    // void draw( sf::RenderTarget& target) const override;
-
-    // void onMousePressed ( const sf::Event& event) override;
-    // void onMouseReleased( const sf::Event& event) override;
-    // void onMouseMoved   ( const sf::Event& event) override;
-};
-
-
-void Render( Canvas canvas, const Geometry& geometry, sf::RenderTarget& target);
-LayoutObject Layout( Canvas canvas, const Constraints& cons);
+void Render( const Canvas& canvas, const Geometry& geometry, sf::RenderTarget& target);
+LayoutObject Layout( const Canvas& canvas, const Constraints& cons);
 
 class ToolsPlugin final
     : public IPlugin
@@ -133,7 +134,7 @@ public:
     ToolsPlugin()
         : IPlugin{}
         , tool_manager_{ std::make_unique<ToolManager>()}
-        , canvas_{ std::make_unique<CanvasImpl>()}
+        , canvas_{ std::make_unique<Canvas>()}
     {$FUNC
         PluginRegistry::instance()->getPlugin<InitPlugin>()->add( getCanvas());
 
@@ -160,11 +161,12 @@ public:
     }
 
     ToolManager* getToolManager() { return tool_manager_.get(); }
-    Canvas getCanvas() { return canvas_.get(); }
+    const Canvas& getCanvas() const { return *canvas_; }
+          Canvas& getCanvas()       { return *canvas_; }
 
 private:
     std::unique_ptr<ToolManager> tool_manager_;
-    std::unique_ptr<CanvasImpl> canvas_;
+    std::unique_ptr<Canvas> canvas_;
 };
 
 } // namespace xui
