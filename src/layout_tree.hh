@@ -62,7 +62,7 @@ private:
         : public LayoutObjectConcept
     {
     public:
-        LayoutObjectModel( const T* widget)
+        LayoutObjectModel( T widget)
             : widget_{ widget}
         {}
 
@@ -71,7 +71,7 @@ private:
             fprintf( stderr, "[RENDER]: %10s s: (%4f %4f) p: (%4f %4f)\n", typeid( T).name(),
                      geometry.size().x, geometry.size().y, geometry.tl().x, geometry.tl().y);
 
-            Render( *widget_, geometry, target);
+            Render( widget_, geometry, target);
 
             sf::RectangleShape rectangle;
             rectangle.setSize( sf::Vector2f{ geometry.size().x, geometry.size().y});
@@ -83,14 +83,14 @@ private:
         }
 
     private:
-        const T* widget_;
+        T widget_;
     };
 
 public:
     using Concept = LayoutObjectConcept;
 
     template <typename T>
-    explicit LayoutObject( const T* widget, const Geometry& geometry = {}, std::size_t prealloc = 0)
+    explicit LayoutObject( const T& widget, const Geometry& geometry = {}, std::size_t prealloc = 0)
         : impl_buffer_{}
         , children_{}
         , geometry_{ geometry}
@@ -102,9 +102,8 @@ public:
         ::new( impl()) Model{ widget};
     }
 
-    // FIXME: LayoutObject( widget, size, prealloc)?
     template <typename T>
-    explicit LayoutObject( const T* widget, std::size_t prealloc)
+    explicit LayoutObject( const T& widget, std::size_t prealloc)
         : LayoutObject{ widget, Geometry{}, prealloc}
     {}
 
@@ -113,7 +112,7 @@ public:
     {
         for ( auto& child : obj.children_ )
         {
-            child.geometry_.move( obj.geometry_.tl());
+            child.geometry_.translate( obj.geometry_.tl());
             Adjust( child);
         }
     }
@@ -132,7 +131,12 @@ private:
           Concept* impl()       { return reinterpret_cast<      Concept*>( impl_buffer_.data()); }
     const Concept* impl() const { return reinterpret_cast<const Concept*>( impl_buffer_.data()); }
 
-    std::array<char, sizeof( LayoutObjectModel<LayoutObject>)> impl_buffer_;
+    // std::array<char, sizeof( LayoutObjectModel<LayoutObject>)> impl_buffer_;
+    //!!!!
+    //!!!!
+    std::array<char, 16> impl_buffer_;
+    //!!!!
+    //!!!!
 
     std::vector<LayoutObject> children_;
     Geometry geometry_;

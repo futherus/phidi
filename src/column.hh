@@ -6,46 +6,49 @@ namespace xui
 {
 
 template<typename T>
-class Column
+struct ColumnImpl final
 {
-public:
-    Column( int padding)
+    ColumnImpl( int padding)
         : padding_{ padding}
         , widgets_{}
     {}
 
-    Column( const Column&) = delete;
-    Column& operator=( const Column&) = delete;
-
-    int getPadding() const { return padding_; }
-    const std::vector<T>& getWidgets() const { return widgets_; }
-    std::vector<T>& getWidgets() { return widgets_; }
-    void add( T widget) { widgets_.push_back( widget); }
-
-private:
-    static_assert( std::is_pointer<T>::value || std::is_same<WidgetPtr, T>::value);
     int padding_;
     std::vector<T> widgets_;
 };
 
 template<typename T>
+class Column final
+    : public Impl<ColumnImpl<T>>
+{
+public:
+    using Impl<ColumnImpl<T>>::Impl;
+    using Impl<ColumnImpl<T>>::impl;
+    //        ^^^^^^^^^^^^^^^ This is mandatory
+
+    int getPadding() const { return impl().padding_; }
+    const std::vector<T>& getWidgets() const { return impl().widgets_; }
+    std::vector<T>& getWidgets() { return impl().widgets_; }
+    void add( T widget) { impl().widgets_.push_back( widget); }
+};
+
+template<typename T>
 inline void
-Render( const Column<T>&,
+Render( Column<T>,
         const Geometry&,
         sf::RenderTarget&)
 {}
 
 template<typename T>
 inline LayoutObject
-Layout( const Column<T>* column,
+Layout( Column<T> column,
         const Constraints& cons)
 {$FUNC
-    assert( column);
-    LayoutObject object{ column, column->getWidgets().size()};
+    LayoutObject object{ column, column.getWidgets().size()};
 
-    Constraints space_left{ sf::Vector2f(cons) - sf::Vector2f{0, 2 * column->getPadding()}};
-    sf::Vector2f position{ 0, column->getPadding()};
-    for ( auto& widget : column->getWidgets() )
+    Constraints space_left{ sf::Vector2f(cons) - sf::Vector2f{0, 2 * column.getPadding()}};
+    sf::Vector2f position{ 0, column.getPadding()};
+    for ( auto& widget : column.getWidgets() )
     {
         $$
         LayoutObject child = Layout( widget, space_left);
@@ -66,8 +69,8 @@ Layout( const Column<T>* column,
         $M( "Child: (%f, %f) (%f, %f)\n", g.tl().x, g.tl().y, g.size().x, g.size().y);
         $M( "Child: (%f, %f) (%f, %f)\n", p.x, p.y, s.x, s.y);
 
-        space_left -= {0, child.getSize().y + column->getPadding()};
-        position.y += child.getSize().y + column->getPadding();
+        space_left -= {0, child.getSize().y + column.getPadding()};
+        position.y += child.getSize().y + column.getPadding();
 
         $$
         object.push_back( std::move( child));

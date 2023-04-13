@@ -20,20 +20,20 @@ public:
     {
         tool_manager_ = tool_manager;
 
-        pallette_.bind(
+        getPallette().bind(
             [&]( int indx){ tool_manager_->setActive( tool_ids_.find( indx)->second); }
         );
     }
 
     void update() override;
 
-    void add( std::string tool_id, PushButton* button);
+    void add( std::string tool_id, PushButton button);
 
-    PushPallette* getPallette() { return &pallette_; }
+    PushPallette getPallette() { return &pallette_; }
 
 private:
     ToolManager* tool_manager_;
-    PushPallette pallette_;
+    PushPalletteImpl pallette_;
 
     std::map<int, std::string> tool_ids_;
 };
@@ -46,7 +46,7 @@ public:
 
     ToolPallettePlugin()
         : IPlugin{}
-        , tool_pallette_{ new ToolPallette}
+        , tool_pallette_{ std::make_unique<ToolPallette>()}
     {$FUNC
         PluginRegistry::instance()->getPlugin<InitPlugin>()->add( tool_pallette_->getPallette());
     }
@@ -61,10 +61,10 @@ public:
 
     void serialize( json&) override {}
 
-    ToolPallette* getToolPallette() { return tool_pallette_; }
+    ToolPallette* getToolPallette() { return tool_pallette_.get(); }
 
 private:
-    ToolPallette* tool_pallette_;
+    std::unique_ptr<ToolPallette> tool_pallette_;
 };
 
 }

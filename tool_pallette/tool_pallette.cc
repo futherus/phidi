@@ -14,19 +14,19 @@ void ToolPallette::update()
     {
         if ( p.second == active )
         {
-            pallette_.update( p.first);
+            getPallette().update( p.first);
             return;
         }
     }
 }
 
-void ToolPallette::add( std::string tool_id, PushButton* button)
+void ToolPallette::add( std::string tool_id, PushButton button)
 {
     // FIXME: button ordering is fixed
     $D( "before inserting index pair\n");
-    tool_ids_.insert( std::pair<int, std::string>{ pallette_.getColumn()->getWidgets().size(), std::move( tool_id)});
+    tool_ids_.insert( std::pair<int, std::string>{ getPallette().getColumn().getWidgets().size(), std::move( tool_id)});
 
-    pallette_.add( button);
+    getPallette().add( button);
 }
 
 }

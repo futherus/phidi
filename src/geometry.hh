@@ -96,7 +96,7 @@ public:
     void setSize   ( sf::Vector2<float> size) { sz_ = size; verify(); }
     void setTopLeft( sf::Vector2<float> tl  ) { tl_ = tl;   verify(); }
 
-    void move( sf::Vector2<float> shift) { tl_ += shift; verify(); }
+    void translate( sf::Vector2<float> shift) { tl_ += shift; verify(); }
 
     bool contains( sf::Vector2<float> point) const
     {

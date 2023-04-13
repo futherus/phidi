@@ -15,7 +15,7 @@
 #include "column.hh"
 #include "button.hh"
 
-xui::WidgetManager* gRootWidget = nullptr;
+xui::WidgetManager gRootWidget;
 
 struct Options
 {
@@ -99,7 +99,7 @@ main( int argc,
 
     $M( "Loaded textures\n");
 
-    auto root_widget = std::make_unique<xui::WidgetManager>( sf::Vector2f{400, 300});
+    auto root_widget = std::make_unique<xui::WidgetManagerImpl>( sf::Vector2f{400, 300});
     gRootWidget = root_widget.get();
 
     $M( "Created root widget\n");
@@ -118,10 +118,10 @@ main( int argc,
 
     $M( "All plugins loaded\n");
 
-    sf::RenderWindow window( sf::VideoMode{800, 600},
+    sf::RenderWindow window( sf::VideoMode{1200, 800},
                              "My window name", sf::Style::Default);
 
-    xui::LayoutObject obj = Layout( gRootWidget, Constraints{400, 300});
+    xui::LayoutObject obj = Layout( gRootWidget, Constraints{600, 800});
 
     $D( "After initial layout\n");
 
@@ -144,7 +144,7 @@ main( int argc,
                 {
                     sf::FloatRect visibleArea(0.f, 0.f, event.size.width, event.size.height);
                     window.setView(sf::View(visibleArea));
-                    obj = Layout( gRootWidget, Constraints{event.size.width / 2, event.size.height / 2});
+                    obj = Layout( gRootWidget, Constraints{event.size.width / 2, event.size.height});
                     Adjust( obj);
                 }
                 // case sf::Event::MouseButtonPressed:

@@ -6,12 +6,30 @@
 namespace xui
 {
 
-class WidgetPtr final
+class Widget final
 {
+public:
+    Widget( Widget&& other) = default;
+    Widget& operator=( Widget&& other) = default;
+
+    // Widget( const Widget& other) = delete;
+
+    Widget( const Widget& other)
+        : impl_{ other.impl_->clone()}
+    {}
+
+    Widget& operator=( const Widget& other)
+    {
+        other.impl_->clone().swap( impl_);
+        return *this;
+    }
+
 private:
     struct WidgetConcept
     {
         virtual ~WidgetConcept() = default;
+        virtual std::unique_ptr<WidgetConcept> clone() const = 0;
+        virtual const void* address() const = 0;
         virtual LayoutObject layout( const Constraints& cons) const = 0;
     };
 
@@ -20,52 +38,86 @@ private:
         : public WidgetConcept
     {
     public:
-        WidgetModel( const T* widget)
-            : widget_{ widget}
+        WidgetModel( T widget)
+            : widget_{ std::move( widget)}
+        {}
+
+        std::unique_ptr<WidgetConcept> clone() const override
         {
-            static_assert( !std::is_same<T, WidgetPtr>::value);
-            assert( widget_);
-            $FUNC
-            // $D( "My destructor: %p\n", std::addressof(~WidgetModel));
+            return std::make_unique<WidgetModel<T>>( *this);
         }
 
-        ~WidgetModel() override
-        {$FUNC}
-
-        virtual LayoutObject layout( const Constraints& cons) const override
-        {$FUNC
-            assert( widget_);
+        LayoutObject layout( const Constraints& cons) const override
+        {
             return Layout( widget_, cons);
         }
 
+        const void* address() const override
+        {
+            return static_cast<const void*>( widget_.address());
+        }
+
     private:
-        const T* widget_;
+        T widget_;
     };
 
 public:
+    using Concept = WidgetConcept;
+
     template <typename T>
-    WidgetPtr( const T* widget)
-        : impl_{ std::make_unique<WidgetModel<T>>( widget)}
+    Widget( T widget)
+        : impl_{ std::make_unique<WidgetModel<T>>( std::move( widget))}
     {}
 
-    WidgetPtr( WidgetPtr&& other) = default;
-    WidgetPtr& operator=( WidgetPtr&& other) = default;
-
-    ~WidgetPtr()
-    {$FUNC}
+    template <typename T>
+    bool operator==( const T& other)
+    {
+        return impl_->address() == other.address();
+    }
 
     friend LayoutObject
-    Layout( const WidgetPtr& widget, const Constraints& cons)
-    {$FUNC
-        assert( widget.impl_.get());
-        LayoutObject object = widget.impl_->layout( cons);
-        $M( "returning WidgetPtr (%f, %f) (%f, %f)\n", object.getPosition().x, object.getPosition().y, object.getSize().x, object.getSize().y);
-
-        return object;
+    Layout( Widget widget, const Constraints& cons)
+    {
+        return widget.impl_->layout( cons);
     }
 
 private:
     std::unique_ptr<WidgetConcept> impl_;
+};
+
+template <typename T>
+class Impl
+{
+// FIXME: Cannot be made private)
+protected:
+    ~Impl() = default;
+
+public:
+    Impl() = default;
+    Impl( T* impl)
+        : impl_{ impl}
+    {}
+
+    Impl( const Impl& other) = default;
+    Impl& operator=( const Impl& other) = default;
+
+    Impl( Impl&& other) = default;
+    Impl& operator=( Impl&& other) = default;
+
+    const T* address() const { return impl_; }
+    // void reset( T* new_impl) { impl_ = new_impl; }
+
+    bool operator==( const Impl& rhs)
+    {
+        return impl_ == rhs.impl_;
+    }
+
+protected:
+          T& impl()       { return *impl_; }
+    const T& impl() const { return *impl_; }
+
+private:
+    T* impl_;
 };
 
 } // namespace xui

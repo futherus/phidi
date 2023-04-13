@@ -2,4 +2,4 @@
 
 #include "widget_manager.hh"
 
-extern xui::WidgetManager* gRootWidget;
+extern xui::WidgetManager gRootWidget;

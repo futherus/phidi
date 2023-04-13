@@ -7,36 +7,41 @@
 namespace xui
 {
 
-class WidgetManager
+struct WidgetManagerImpl
 {
-public:
-    WidgetManager( sf::Vector2f size)
+    WidgetManagerImpl( sf::Vector2f size)
         : size_{ size}
     {}
 
-    sf::Vector2f getSize() const { return size_; }
-    const std::vector<WidgetPtr>& getWidgets() const { return widgets_; }
-    std::vector<WidgetPtr>& getWidgets() { return widgets_; }
-
-private:
     sf::Vector2f size_;
-    std::vector<WidgetPtr> widgets_;
+    std::vector<Widget> widgets_;
+};
+
+class WidgetManager
+    : public Impl<WidgetManagerImpl>
+{
+public:
+    using Impl<WidgetManagerImpl>::Impl;
+
+    sf::Vector2f getSize() const { return impl().size_; }
+    const std::vector<Widget>& getWidgets() const { return impl().widgets_; }
+    std::vector<Widget>& getWidgets() { return impl().widgets_; }
 };
 
 inline void
-Render( const WidgetManager&,
+Render( WidgetManager,
         const Geometry&,
         sf::RenderTarget&)
 {}
 
 inline LayoutObject
-Layout( const WidgetManager* manager,
+Layout( WidgetManager manager,
         const Constraints& cons)
 {$FUNC
-    LayoutObject object{ manager, manager->getWidgets().size()};
+    LayoutObject object{ manager, manager.getWidgets().size()};
     object.setSize( cons);
 
-    for ( auto& widget : manager->getWidgets() )
+    for ( auto& widget : manager.getWidgets() )
     {
         LayoutObject child = Layout( widget, cons);
 

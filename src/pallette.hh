@@ -7,35 +7,41 @@
 namespace xui
 {
 
-class PushPallette
+struct PushPalletteImpl final
 {
-private:
-    Column<PushButton*> column_;
-    std::function<void( int)> on_change_;
-    int active_button_;
-
-public:
-    PushPallette( int padding)
+    PushPalletteImpl( int padding)
         : column_{ padding}
         , on_change_{}
         , active_button_{}
     {}
 
+    ColumnImpl<PushButton> column_;
+    std::function<void( int)> on_change_;
+    int active_button_;
+};
+
+class PushPallette final
+    : public Impl<PushPalletteImpl>
+{
+public:
+    using Impl::Impl;
+
     void bind( std::function<void( int)>&& func)
     {
-        on_change_ = std::move( func);
+        impl().on_change_ = std::move( func);
     }
 
-    void add( PushButton* button);
+    void add( PushButton button);
 
     void update( int new_state);
     void onChange( bool new_state, int index);
 
-    const Column<PushButton*>* getColumn() const { return &column_; }
+    // const Column<PushButton> getColumn() const { return &impl().column_; }
+    Column<PushButton> getColumn() { return &impl().column_; }
 };
 
-void Render( const PushPallette& pallette, const Geometry& geometry, sf::RenderTarget& target);
+void Render( PushPallette pallette, const Geometry& geometry, sf::RenderTarget& target);
 
-LayoutObject Layout( const PushPallette* pallette, const Constraints& cons);
+LayoutObject Layout( PushPallette pallette, const Constraints& cons);
 
 } // namespace xui
