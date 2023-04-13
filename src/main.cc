@@ -12,8 +12,10 @@
 #include "plugin_registry.hh"
 // #include "event.hh"
 #include "root.hh"
+#include "column.hh"
+#include "button.hh"
 
-xui::WidgetManager<xui::IWidget> gRootWidget{ Rectangle( { 100, 100}, { 800, 800})};
+xui::WidgetManager* gRootWidget = nullptr;
 
 struct Options
 {
@@ -97,6 +99,11 @@ main( int argc,
 
     $M( "Loaded textures\n");
 
+    auto root_widget = std::make_unique<xui::WidgetManager>( sf::Vector2f{400, 300});
+    gRootWidget = root_widget.get();
+
+    $M( "Created root widget\n");
+
     xui::json plugins = ReadJson( opts.plugin_ser_);
 
     $M( "Before loading plugins\n");
@@ -111,8 +118,14 @@ main( int argc,
 
     $M( "All plugins loaded\n");
 
-    sf::RenderWindow window( sf::VideoMode{1600, 1000},
+    sf::RenderWindow window( sf::VideoMode{800, 600},
                              "My window name", sf::Style::Default);
+
+    xui::LayoutObject obj = Layout( gRootWidget, Constraints{400, 300});
+
+    $D( "After initial layout\n");
+
+    Render( obj, window);
 
     while ( window.isOpen() )
     {
@@ -127,48 +140,55 @@ main( int argc,
                     window.close();
                     break;
                 }
-                case sf::Event::MouseButtonPressed:
+                case sf::Event::Resized:
                 {
-                    $D( "mouse pressed\n");
-                    sf::Vector2f mouse_pos{ event.mouseButton.x, event.mouseButton.y};
-                    if ( gRootWidget.contains( mouse_pos) )
-                         gRootWidget.onMousePressed( event);
-
-                    break;
+                    sf::FloatRect visibleArea(0.f, 0.f, event.size.width, event.size.height);
+                    window.setView(sf::View(visibleArea));
+                    obj = Layout( gRootWidget, Constraints{event.size.width / 2, event.size.height / 2});
+                    Adjust( obj);
                 }
-                case sf::Event::MouseButtonReleased:
-                {
-                    sf::Vector2f mouse_pos{ event.mouseButton.x, event.mouseButton.y};
-                    if ( gRootWidget.contains( mouse_pos) )
-                         gRootWidget.onMouseReleased( event);
+                // case sf::Event::MouseButtonPressed:
+                // {
+                //     $D( "mouse pressed\n");
+                //     sf::Vector2f mouse_pos{ event.mouseButton.x, event.mouseButton.y};
+                //     if ( gRootWidget.contains( mouse_pos) )
+                //          gRootWidget.onMousePressed( event);
 
-                    break;
-                }
-                case sf::Event::MouseMoved:
-                {
-                    gRootWidget.onMouseMoved( event);
+                //     break;
+                // }
+                // case sf::Event::MouseButtonReleased:
+                // {
+                //     sf::Vector2f mouse_pos{ event.mouseButton.x, event.mouseButton.y};
+                //     if ( gRootWidget.contains( mouse_pos) )
+                //          gRootWidget.onMouseReleased( event);
 
-                    break;
-                }
-                case sf::Event::KeyPressed:
-                {
-                    gRootWidget.onKeyPressed( event);
+                //     break;
+                // }
+                // case sf::Event::MouseMoved:
+                // {
+                //     gRootWidget.onMouseMoved( event);
 
-                    break;
-                }
-                case sf::Event::KeyReleased:
-                {
-                    gRootWidget.onKeyReleased( event);
+                //     break;
+                // }
+                // case sf::Event::KeyPressed:
+                // {
+                //     gRootWidget.onKeyPressed( event);
 
-                    break;
-                }
+                //     break;
+                // }
+                // case sf::Event::KeyReleased:
+                // {
+                //     gRootWidget.onKeyReleased( event);
 
-                case sf::Event::TextEntered:
-                {
-                    gRootWidget.onTextEntered( event);
+                //     break;
+                // }
 
-                    break;
-                }
+                // case sf::Event::TextEntered:
+                // {
+                //     gRootWidget.onTextEntered( event);
+
+                //     break;
+                // }
                 default:
                 {
                     break;
@@ -178,7 +198,7 @@ main( int argc,
 
         window.clear( sf::Color::Black);
 
-        gRootWidget.draw( window);
+        Render( obj, window);
         window.display();
     }
 

@@ -9,7 +9,7 @@ void ToolBrush::onMousePressed( Canvas* canvas, sf::Vector2f pos)
     onMouseMoved( canvas, pos);
 }
 
-void ToolBrush::onMouseReleased( Canvas* canvas, sf::Vector2f pos)
+void ToolBrush::onMouseReleased( Canvas*, sf::Vector2f)
 {
     is_pressed_ = false;
 }

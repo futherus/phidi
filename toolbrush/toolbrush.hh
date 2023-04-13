@@ -1,5 +1,4 @@
-#ifndef TOOLBRUSH_HH
-#define TOOLBRUSH_HH
+#pragma once
 
 #include "../tools/tools.hh"
 #include "../tool_pallette/tool_pallette.hh"
@@ -7,7 +6,7 @@
 namespace xui
 {
 
-class ToolBrush
+class ToolBrush final
     : public ITool
 {
 public:
@@ -36,7 +35,7 @@ private:
     bool is_pressed_;
 };
 
-class ToolBrushPlugin
+class ToolBrushPlugin final
     : public IPlugin
 {
 public:
@@ -44,59 +43,63 @@ public:
 
     ToolBrushPlugin()
         : IPlugin{}
-        , tool_{ new ToolBrush( "ToolBrushPlugin::tool")}
-        , tool_button_{}
+        , tool1_{ std::make_unique<ToolBrush>( "ToolBrushPlugin::tool1")}
+        , tool2_{ std::make_unique<ToolBrush>( "ToolBrushPlugin::tool2")}
+        , tool_button1_{}
+        , tool_button2_{}
     {}
-
-    ~ToolBrushPlugin() = default;
 
     void deserialize( const json& state) override
     {
         // tool_->setColor( state["color"]);
-        tool_->setColor( sf::Color::Red);
-        tool_->setWidth( state["width"]);
+        tool1_->setColor( sf::Color::Red);
+        tool1_->setWidth( state["width"]);
+        tool2_->setColor( sf::Color::Red);
+        tool2_->setWidth( state["width"]);
 
         $D( "before adding tool\n");
         auto tl_mngr_plg = PluginRegistry::instance()->getPlugin<ToolsPlugin>();
         auto tl_mngr = tl_mngr_plg->getToolManager();
-        tl_mngr->addTool( tool_);
+        tl_mngr->addTool( tool1_.get());
+        tl_mngr->addTool( tool2_.get());
 
         $D( "before creating button\n");
         const sf::Texture* ph = gui::TextureFactory::getTexture("ph");
         const sf::Texture* Ph = gui::TextureFactory::getTexture("Ph");
         const sf::Texture* pH = gui::TextureFactory::getTexture("pH");
         const sf::Texture* PH = gui::TextureFactory::getTexture("PH");
+        $M( "Textures: %p, %p, %p, %p\n", ph, Ph, pH, PH);
+        assert( ph && Ph && pH && PH);
 
         xui::PushButton::TexturePack pack{
             std::array<const sf::Texture*, 2>{ ph, Ph},
             std::array<const sf::Texture*, 2>{ pH, PH}
         };
 
-        tool_button_ = new PushButton{
-            Rectangle{ {110, 110}, {100, 100}},
-            std::move( pack)
-        };
+        tool_button1_ = std::make_unique<PushButton>( pack, sf::Vector2f{ 100, 100});
+        tool_button2_ = std::make_unique<PushButton>( std::move( pack), sf::Vector2f{ 100, 100});
 
         $D ( "before getting tool_pall plugin\n");
         auto tl_pal_plg = PluginRegistry::instance()->getPlugin<ToolPallettePlugin>();
         $D ( "before getting tool_pall\n");
         auto tl_pal = tl_pal_plg->getToolPallette();
         $D ( "before adding button\n");
-        tl_pal->add( "ToolBrushPlugin::tool", tool_button_);
+        tl_pal->add( "ToolBrushPlugin::tool1", tool_button1_.get());
+        tl_pal->add( "ToolBrushPlugin::tool2", tool_button1_.get());
         $D ( "after adding button\n");
     }
 
     void serialize( json& state) override
     {
         // state["color"] = tool_->getColor();
-        state["width"] = tool_->getWidth();
+        // state["width"] = tool_->getWidth();
     }
 
 private:
-    ToolBrush* tool_;
-    PushButton* tool_button_;
+    std::unique_ptr<ToolBrush> tool1_;
+    std::unique_ptr<ToolBrush> tool2_;
+    std::unique_ptr<PushButton> tool_button1_;
+    std::unique_ptr<PushButton> tool_button2_;
 };
 
 } // namespace xui
-
-#endif // TOOLBRUSH_HH

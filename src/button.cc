@@ -1,62 +1,56 @@
 #include "button.hh"
+#include "debug.hh"
 
 namespace xui
 {
 
-void PushButton::adjustTexture()
+// void
+// onMousePressed( PushButton& button,
+//                      const sf::Event&)
+// {$FUNC
+//     button.on_click_( !button.is_pushed_);
+// }
+
+// void
+// onMouseMoved( PushButton& button,
+//                    const sf::Event& event)
+// {
+//     float x = static_cast<float>( event.mouseMove.x);
+//     float y = static_cast<float>( event.mouseMove.y);
+
+//     // ???????????????????????????????????????? //
+//     button.is_hovered_ = button.contains( {x, y});
+// }
+
+void
+Render( const PushButton& button,
+        const Geometry& geometry, 
+        sf::RenderTarget& target)
 {
-    const sf::Texture* texture = textures_[is_hovered_][is_pushed_];
+    $M( "Render: Pointer to button: %p\n", &button);
+
+    // $M( "hov: %d, push: %d\n", (int) button.isHovered(), (int) button.isPushed());
+    const sf::Texture* texture = button.getTextures().at( button.isHovered()).at( button.isPushed());
+    $M( "Texture: %p\n", texture);
     assert( texture);
-    sprite_.setTexture( *texture, true);
-    sprite_.setPosition( bounds().tl());
 
-    // texture_->adjust({bounds().left(), bounds().top()}, is_hovered_, is_pushed_);
+    sf::Sprite sprite;
+    sprite.setTexture( *texture, true);
+    sprite.setPosition( geometry.tl());
+
+    target.draw( sprite);
 }
 
-PushButton::PushButton( const Rectangle& bounds,
-                        TexturePack textures)
-    : IWidget{ bounds}
-    , on_click_{}
-    , textures_{ textures}
-    , sprite_{}
-    , is_pushed_{}
-    , is_hovered_{}
-{
-    adjustTexture();
-}
-
-void PushButton::bind( std::function<void( bool)>&& func)
-{
-    on_click_ = std::move( func);
-}
-
-void PushButton::update( bool new_state)
-{
-    is_pushed_ = new_state;
-
-    adjustTexture();
-}
-
-void PushButton::onMousePressed( const sf::Event&)
+LayoutObject
+Layout( const PushButton* button,
+        const Constraints& cons)
 {$FUNC
-    on_click_( !is_pushed_);
-}
+    assert( cons >= button->getSize());
 
-void PushButton::onMouseMoved(const sf::Event& event)
-{
-    float x = static_cast<float>( event.mouseMove.x);
-    float y = static_cast<float>( event.mouseMove.y);
-
-    is_hovered_ = contains( {x, y});
-
-    adjustTexture();
-}
-
-void PushButton::draw( sf::RenderTarget& target) const
-{
-    target.draw( sprite_);
-
-    this->IWidget::draw( target);
+    $M( "Layout: Pointer to button: %p\n", button);
+    LayoutObject object = LayoutObject{ button, {{}, button->getSize()}};
+    $M( "returning PushButton (%f, %f) (%f, %f)\n", object.getPosition().x, object.getPosition().y, object.getSize().x, object.getSize().y);
+    return object;
 }
 
 } // namespace xui

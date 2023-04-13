@@ -1,56 +1,89 @@
-#ifndef BUTTON_HH
-#define BUTTON_HH
+#pragma once
 
 #include <assert.h>
 #include <array>
 #include <functional>
-// #include "bind.hh"
 #include "widget.hh"
 
 namespace xui
 {
 
-class PushButton
-    : public IWidget
+class PushButton final
 {
 public:
     using TexturePack = std::array<std::array<const sf::Texture*, 2>, 2>;
 
+    PushButton( TexturePack textures, sf::Vector2f size)
+        : textures_{ std::move( textures)}
+        , on_click_{}
+        , size_{ size}
+        , is_pushed_{}
+        , is_hovered_{}
+    {
+        assert( textures_[0][0] && textures_[0][1] && textures_[1][0] && textures_[1][1]);
+        $M( "Button size: (%f, %f)\n", size.x, size.y);
+        // assert( size_ != Vector2f{0, 0});
+    }
+
+    void bind( std::function<void( bool)>&& on_click)
+    {
+        on_click_ = std::move( on_click);
+    }
+
+    void update( bool val) { is_pushed_ = val; }
+
+    bool isPushed() const { return is_pushed_; }
+    bool isHovered() const { return is_hovered_; }
+    sf::Vector2f getSize() const { return size_; }
+    const TexturePack& getTextures() const
+    {
+        assert( textures_[0][0] && textures_[0][1] && textures_[1][0] && textures_[1][1]);
+        $M( "Textures: %p, %p, %p, %p\n", textures_[0][0], textures_[0][1], textures_[1][0], textures_[1][1]);
+        return textures_;
+    }
+
 private:
+    TexturePack textures_;
     std::function<void( bool)> on_click_;
 
-    TexturePack textures_;
-    sf::Sprite sprite_;
+    sf::Vector2f size_;
 
     bool is_pushed_;
     bool is_hovered_;
     // bool is_focused_;
-
-    void adjustTexture();
-
-public:
-    PushButton( const Rectangle& bounds, TexturePack textures);
-
-    // template <class TObject, typename TExtraArg>
-    // void bind( TObject& object,
-    //            typename xui::Bind<TObject, bool, TExtraArg>::Method method,
-    //            TExtraArg extra_arg)
-    // {
-    //     on_click_ = std::make_unique<xui::Bind<TObject, bool, TExtraArg>>( object, method, extra_arg);
-    // }
-
-    void bind( std::function<void( bool)>&& func);
-
-    void update( bool new_state);
-    void onMousePressed( const sf::Event&) override;
-    void onMouseMoved( const sf::Event& event) override;
-
-    bool isPushed()  const { return is_pushed_; }
-    bool isHovered() const { return is_hovered_; }
-
-    void draw( sf::RenderTarget& target) const override;
 };
 
-} // namespace xui
 
-#endif // BUTTON_HH
+void onMousePressed( PushButton&, const sf::Event&);
+void onMouseMoved(   PushButton&, const sf::Event&);
+
+void Render( const PushButton& button, const Geometry& geometry, sf::RenderTarget& target);
+LayoutObject Layout( const PushButton* button, const Constraints& cons);
+
+/*
+std::unique_ptr<Button::ButtonImplHandler>
+
+class Button
+{
+private:
+    struct ButtonImpl
+    {
+        TexturePack textures_;
+        std::function<void( bool)> on_click_;
+
+        sf::Vector2f size_;
+
+        bool is_pushed_;
+        bool is_hovered_;
+    };
+
+public:
+    struct ButtonImplHandler
+    {
+        virtual ~ButtonImplHandler();
+    }
+
+};
+*/
+
+} // namespace xui

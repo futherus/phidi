@@ -1,5 +1,4 @@
-#ifndef RESOURCES_H
-#define RESOURCES_H
+#pragma once
 
 #include <SFML/Graphics.hpp>
 #include <map>
@@ -39,5 +38,3 @@ public:
 };
 
 } // namespace gui
-
-#endif // RESOURCES_H

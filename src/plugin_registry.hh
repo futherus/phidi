@@ -1,5 +1,4 @@
-#ifndef PLUGIN_REGISTRY_HH
-#define PLUGIN_REGISTRY_HH
+#pragma once
 
 #include <unordered_map>
 #include <string>
@@ -98,5 +97,3 @@ public:
 };
 
 } // namespace xui
-
-#endif // PLUGIN_REGISTRY_HH

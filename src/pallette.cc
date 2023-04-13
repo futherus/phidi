@@ -3,39 +3,22 @@
 namespace xui
 {
 
-void PushPallette::adjustSprite()
-{
-    // sprite_.setTexture( *texture_);
-    // sprite_.setBounds( bounds());
-}
-
-PushPallette::PushPallette( const Rectangle& bounds)
-    : WidgetManager{ bounds}
-{
-    // FIXME: bounds vs width
-}
-
-void PushPallette::bind( std::function<void( int)>&& func)
-{
-    on_change_ = std::move(func);
-}
-
 void PushPallette::add( PushButton* button)
 {
-    size_t sz = size();
+    size_t sz = column_.getWidgets().size();
     button->bind( [=]( bool val){ this->onChange( val, sz); });
 
-    this->WidgetManager::add( button);
+    this->column_.add( button);
 }
 
 void PushPallette::update( int new_state)
 {$FUNC
     active_button_ = new_state;
 
-    for ( size_t i = 0; i < size(); i++ )
-        widgets_.at( i)->update( false);
+    for ( size_t i = 0; i < column_.getWidgets().size(); i++ )
+        column_.getWidgets().at( i)->update( false);
 
-    widgets_.at( active_button_)->update( true);
+    column_.getWidgets().at( active_button_)->update( true);
 }
 
 void PushPallette::onChange( bool is_pressed,
@@ -50,11 +33,28 @@ void PushPallette::onChange( bool is_pressed,
     on_change_( button_index);
 }
 
-void PushPallette::draw( sf::RenderTarget& target) const
+void
+Render( const PushPallette& pallette,
+        const Geometry& geometry,
+        sf::RenderTarget& target)
 {
-    // sprite_.draw( target);
+    sf::RectangleShape background;
+    background.setSize( geometry.size());
+    background.setFillColor( sf::Color::Green);
+    background.setPosition( geometry.tl());
+    target.draw( background);
+}
 
-    WidgetManager::draw( target);
+LayoutObject
+Layout( const PushPallette* pallette,
+        const Constraints& cons)
+{$FUNC
+    LayoutObject object{ pallette, Geometry{{}, cons}, 1};
+
+    object.push_back( Layout( pallette->getColumn(), cons));
+
+    $M( "returning PushPallette (%f, %f) (%f, %f)\n", object.getPosition().x, object.getPosition().y, object.getSize().x, object.getSize().y);
+    return object;
 }
 
 } // namespace xui

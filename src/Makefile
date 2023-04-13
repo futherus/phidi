@@ -41,7 +41,7 @@ CXXFLAGS ?= 	   -O2 -g -std=c++14 -fmax-errors=100 -Wall -Wextra   				\
     			#    -fsanitize=vptr                                                 				\
     			#    -lm -pie
 
-SRC 	:= main.cc widget.cc button.cc pallette.cc resources.cc
+SRC 	:= main.cc button.cc pallette.cc resources.cc
 
 OUT 	:= main.o
 

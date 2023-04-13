@@ -1,6 +1,4 @@
-#ifndef TOOLS_HH
-#define TOOLS_HH
-
+#pragma once
 
 #include <cassert>
 #include <SFML/Graphics.hpp>
@@ -15,6 +13,8 @@ namespace xui
 
 class IView
 {
+protected:
+    ~IView() = default;
 public:
     virtual void update() = 0;
 };
@@ -25,6 +25,9 @@ class ITool
 {
 private:
     std::string id_;
+
+protected:
+    ~ITool() = default;
 
 public:
     ITool( std::string id)
@@ -62,13 +65,12 @@ public:
 };
 
 class Canvas
-    : public IWidget
 {
 private:
+    sf::Vector2f size_;
     ToolManager* tool_manager_;
 
     sf::RenderTexture pixels_;
-    sf::Sprite sprite_;
     sf::Color base_color_;
 
     bool is_pressed_;
@@ -77,10 +79,9 @@ private:
 
 public:
     Canvas()
-        : IWidget{ Rectangle{ { 300, 300}, { 300, 300}}}
+        : size_{ 300, 300}
         , tool_manager_{}
         , pixels_{}
-        , sprite_{}
         , base_color_{}
         , is_pressed_{}
         , is_hovered_{}
@@ -89,26 +90,33 @@ public:
 
     void init()
     {
-        pixels_.create((uint32_t) bounds().width(), (uint32_t) bounds().height());
-        sprite_.setTexture(pixels_.getTexture());
-        sprite_.setPosition(bounds().tl());
+        pixels_.create( size_.x, size_.y);
+        // sprite_.setTexture( pixels_.getTexture());
+        // sprite_.setPosition( bounds().tl());
         clear();
     }
 
     void setToolManager( ToolManager* tool_manager) { tool_manager_ = tool_manager; }
     void setBaseColor( sf::Color color) { base_color_ = color; }
-    sf::Color getBaseColor() { return base_color_; }
+
+    sf::Color getBaseColor() const { return base_color_; }
+    sf::Vector2f getSize() const { return size_; }
+    const sf::RenderTexture* getRenderTexture() const { return &pixels_; }
 
     void clear();
     void drawCircle( sf::Vector2f pos, float radius, sf::Color color);
     void drawLine( sf::Vector2f pos1, sf::Vector2f pos2, float width, sf::Color color);
 
-    void draw( sf::RenderTarget& target) const override;
+    // void draw( sf::RenderTarget& target) const override;
 
-    void onMousePressed ( const sf::Event& event) override;
-    void onMouseReleased( const sf::Event& event) override;
-    void onMouseMoved   ( const sf::Event& event) override;
+    // void onMousePressed ( const sf::Event& event) override;
+    // void onMouseReleased( const sf::Event& event) override;
+    // void onMouseMoved   ( const sf::Event& event) override;
 };
+
+
+void Render( const Canvas& canvas, const Geometry& geometry, sf::RenderTarget& target);
+LayoutObject Layout( const Canvas* canvas, const Constraints& cons);
 
 class ToolsPlugin final
     : public IPlugin
@@ -124,8 +132,8 @@ public:
         : IPlugin{}
         , tool_manager_{ new ToolManager}
         , canvas_{ new Canvas}
-    {
-        PluginRegistry::instance()->getPlugin<InitPlugin>()->add( canvas_);
+    {$FUNC
+        // PluginRegistry::instance()->getPlugin<InitPlugin>()->add( canvas_);
     }
 
     ~ToolsPlugin() = default;
@@ -152,5 +160,3 @@ public:
 };
 
 } // namespace xui
-
-#endif // TOOLS_HH

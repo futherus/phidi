@@ -1,11 +1,10 @@
-#ifndef INIT_HH
-#define INIT_HH
+#pragma once
 
-#include "../src/widget_manager.hh"
+// #include "../src/widget_manager.hh"
+#include "../src/column.hh"
 #include "../src/plugin_registry.hh"
 // #include "../src/event.hh"
 #include "../src/root.hh"
-#include "../src/rectangle.hh"
 
 namespace xui
 {
@@ -14,35 +13,33 @@ class InitPlugin final
     : public IPlugin
 {
 private:
-    WidgetManager<IWidget>* manager_;
+    std::unique_ptr<Column<WidgetPtr>> manager_;
 
 public:
     static const int ID;
 
     InitPlugin()
         : IPlugin{}
-        , manager_{ new WidgetManager<IWidget>{ gRootWidget.bounds()}}
+        , manager_{ std::make_unique<Column<WidgetPtr>>( 10)}
     {
-        gRootWidget.add( manager_);
+        gRootWidget->getWidgets().push_back( WidgetPtr{ manager_.get()});
     }
 
     ~InitPlugin() = default;
 
-    void deserialize( const json& state) override
+    void deserialize( const json&) override
     {
         // auto tl_mngr_plg = PluginRegistry::instance()->getPlugin<ToolsPlugin>();
         // tool_pallette_->setToolManager( tl_mngr_plg->getToolManager());
     }
 
-    void serialize( json& state) override {}
+    void serialize( json&) override {}
 
-    void add( IWidget* widget)
+    void add( WidgetPtr widget)
     {
         // FIXME: Find in serialization.
-        manager_->add( widget);
+        manager_->getWidgets().push_back( std::move( widget));
     }
 };
 
 }
-
-#endif // INIT_HH

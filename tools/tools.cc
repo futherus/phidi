@@ -57,7 +57,7 @@ void Canvas::clear()
 {
     is_pressed_ = false;
 
-    sf::RectangleShape rect{ bounds().size()};
+    sf::RectangleShape rect{ size_};
     rect.setFillColor( base_color_);
 
     pixels_.draw( rect);
@@ -86,42 +86,63 @@ void Canvas::drawLine( sf::Vector2f pos1, sf::Vector2f pos2, float width, sf::Co
     pixels_.display();
 }
 
-void Canvas::draw( sf::RenderTarget& target) const
-{
-    this->IWidget::draw( target);
+// void Canvas::draw( sf::RenderTarget& target) const
+// {
+//     this->IWidget::draw( target);
 
-    // printf("drawing canvas %lgx%lg at (%lg, %lg)\n", bounds().width(), bounds().height(), bounds().left(), bounds().top());
-    // printf("texture: %ux%u\n", texture_.getSize().x, texture_.getSize().y);
-    // printf("sprite: (%lg, %lg)\n", sprite_.getPosition().x, sprite_.getPosition().y);
-    // std::cout << std::hex << pixels_.at(11) << std::endl;
-    target.draw( sprite_);
+//     // printf("drawing canvas %lgx%lg at (%lg, %lg)\n", bounds().width(), bounds().height(), bounds().left(), bounds().top());
+//     // printf("texture: %ux%u\n", texture_.getSize().x, texture_.getSize().y);
+//     // printf("sprite: (%lg, %lg)\n", sprite_.getPosition().x, sprite_.getPosition().y);
+//     // std::cout << std::hex << pixels_.at(11) << std::endl;
+//     target.draw( sprite_);
+// }
+
+void
+Render( const Canvas& canvas,
+        const Geometry& geometry, 
+        sf::RenderTarget& target)
+{
+    sf::Sprite sprite;
+    sprite.setTexture( canvas.getRenderTexture()->getTexture(), true);
+    sprite.setPosition( geometry.tl());
+
+    target.draw( sprite);
 }
 
-void Canvas::onMousePressed( const sf::Event& event)
-{
-    // printf("mouse pressed\n");
-    // is_pressed_ = true;
-    sf::Vector2f pos = {event.mouseButton.x, event.mouseButton.y};
-    tool_manager_->getActiveTool()->onMousePressed( this, pos - bounds().tl());
+LayoutObject
+Layout( const Canvas* canvas,
+        const Constraints& cons)
+{$FUNC
+    assert( cons >= canvas->getSize());
 
+    return LayoutObject{ canvas, {{}, canvas->getSize()}};
 }
 
-void Canvas::onMouseReleased( const sf::Event& event)
-{
-    // printf("mouse released\n");
-    // is_pressed_ = false;
-    sf::Vector2f pos = {event.mouseButton.x, event.mouseButton.y};
-    tool_manager_->getActiveTool()->onMouseReleased( this, pos - bounds().tl());
+// void Canvas::onMousePressed( const sf::Event& event)
+// {
+//     // printf("mouse pressed\n");
+//     // is_pressed_ = true;
+//     sf::Vector2f pos = {event.mouseButton.x, event.mouseButton.y};
+//     tool_manager_->getActiveTool()->onMousePressed( this, pos - bounds().tl());
 
-}
+// }
 
-void Canvas::onMouseMoved( const sf::Event& event)
-{
-    sf::Vector2f pos = {event.mouseMove.x, event.mouseMove.y};
-    if (!contains( pos))
-        return;
+// void Canvas::onMouseReleased( const sf::Event& event)
+// {
+//     // printf("mouse released\n");
+//     // is_pressed_ = false;
+//     sf::Vector2f pos = {event.mouseButton.x, event.mouseButton.y};
+//     tool_manager_->getActiveTool()->onMouseReleased( this, pos - bounds().tl());
 
-    tool_manager_->getActiveTool()->onMouseMoved( this, pos - bounds().tl());
-}
+// }
+
+// void Canvas::onMouseMoved( const sf::Event& event)
+// {
+//     sf::Vector2f pos = {event.mouseMove.x, event.mouseMove.y};
+//     if (!contains( pos))
+//         return;
+
+//     tool_manager_->getActiveTool()->onMouseMoved( this, pos - bounds().tl());
+// }
 
 } // namespace xui

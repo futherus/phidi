@@ -1,45 +1,71 @@
-#ifndef WIDGET_HH
-#define WIDGET_HH
+#pragma once
 
-#include <SFML/Graphics.hpp>
-#include "rectangle.hh"
+#include "layout_tree.hh"
 #include "debug.hh"
 
 namespace xui
 {
 
-class IWidget
+class WidgetPtr final
 {
 private:
-    Rectangle bounds_;
+    struct WidgetConcept
+    {
+        virtual ~WidgetConcept() = default;
+        virtual LayoutObject layout( const Constraints& cons) const = 0;
+    };
 
-    sf::RenderTexture pixels_;
-    sf::Sprite sprite_;
+    template <typename T>
+    class WidgetModel final
+        : public WidgetConcept
+    {
+    public:
+        WidgetModel( const T* widget)
+            : widget_{ widget}
+        {
+            static_assert( !std::is_same<T, WidgetPtr>::value);
+            assert( widget_);
+            $FUNC
+            // $D( "My destructor: %p\n", std::addressof(~WidgetModel));
+        }
 
-    void adjustSprite();
+        ~WidgetModel() override
+        {$FUNC}
+
+        virtual LayoutObject layout( const Constraints& cons) const override
+        {$FUNC
+            assert( widget_);
+            return Layout( widget_, cons);
+        }
+
+    private:
+        const T* widget_;
+    };
 
 public:
-    IWidget( const Rectangle& bounds);
+    template <typename T>
+    WidgetPtr( const T* widget)
+        : impl_{ std::make_unique<WidgetModel<T>>( widget)}
+    {}
 
-    IWidget( const IWidget&) = delete;
-    IWidget( IWidget&&) = delete;
-    IWidget& operator=( const IWidget&) = delete;
-    IWidget& operator=( IWidget&&) = delete;
-    virtual ~IWidget() = default;
+    WidgetPtr( WidgetPtr&& other) = default;
+    WidgetPtr& operator=( WidgetPtr&& other) = default;
 
-    Rectangle bounds() const { return bounds_; }
-    bool contains( sf::Vector2f pos) { return bounds_.contains( pos); }
+    ~WidgetPtr()
+    {$FUNC}
 
-    virtual void onMousePressed( const sf::Event&) {}
-    virtual void onMouseReleased( const sf::Event&) {}
-    virtual void onMouseMoved( const sf::Event&) {}
-    virtual void onKeyPressed( const sf::Event&) {}
-    virtual void onKeyReleased( const sf::Event&) {}
-    virtual void onTextEntered( const sf::Event&) {}
+    friend LayoutObject
+    Layout( const WidgetPtr& widget, const Constraints& cons)
+    {$FUNC
+        assert( widget.impl_.get());
+        LayoutObject object = widget.impl_->layout( cons);
+        $M( "returning WidgetPtr (%f, %f) (%f, %f)\n", object.getPosition().x, object.getPosition().y, object.getSize().x, object.getSize().y);
 
-    virtual void draw( sf::RenderTarget& target) const = 0;
+        return object;
+    }
+
+private:
+    std::unique_ptr<WidgetConcept> impl_;
 };
 
 } // namespace xui
-
-#endif // WIDGET_HH

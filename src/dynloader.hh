@@ -1,5 +1,4 @@
-#ifndef DYNLOADER_HH
-#define DYNLOADER_HH
+#pragma once
 
 #include <vector>
 #include <string>
@@ -37,7 +36,9 @@ public:
      */
     ~DynamicLoader()
     {
-        for (auto handle : handles_)
+        // for ( size_t i = 1; i < handles_.size(); i++ )
+        //     unload( handles_.at(i));
+        for ( auto handle : handles_ )
             unload( handle);
     }
 
@@ -62,5 +63,3 @@ public:
 };
 
 } // namespace xui
-
-#endif // DYNLOADER_HH

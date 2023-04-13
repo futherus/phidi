@@ -1,5 +1,4 @@
-#ifndef DEBUG_HH
-#define DEBUG_HH
+#pragma once
 
 #define RESET "\u001b[0m"
 #define BLACK "\u001b[30m"
@@ -14,7 +13,7 @@
 #define $M(FMT, ...) std::fprintf(stderr, BLUE "MSG: " RESET FMT, ##__VA_ARGS__)
 
 #ifndef NDEBUG
-    #define $$ std::fprintf(stderr, BLUE "\t\% " RESET "%s:%d %s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    #define $$ std::fprintf(stderr, BLUE "\t " RESET "%s:%d %s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__);
     #define $D(FMT, ...) std::fprintf(stderr, MAGENTA "DBG: " RESET FMT, ##__VA_ARGS__)
     #ifndef NFUNC
         #define $FUNC std::fprintf(stderr, YELLOW "-> " RESET "%s:%d %s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__);
@@ -26,5 +25,3 @@
     #define $$
     #define $D(FMT, ...)
 #endif
-
-#endif // DEBUG_HH

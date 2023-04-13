@@ -1,46 +1,41 @@
-#ifndef PALLETTE_HH
-#define PALLETTE_HH
+#pragma once
 
+#include "debug.hh"
 #include "button.hh"
-#include "widget_manager.hh"
-// #include "bind.hh"
-// #include "texture.h"
+#include "column.hh"
 
 namespace xui
 {
 
 class PushPallette
-    : public WidgetManager<PushButton>
 {
-    // std::unique_ptr<xui::IBind<int>> on_change_;
+private:
+    Column<PushButton*> column_;
     std::function<void( int)> on_change_;
     int active_button_;
 
-    // gui::BorderTexture* texture_;
-    // gui::BorderSprite sprite_;
-
-    void adjustSprite();
-
 public:
-    PushPallette( const Rectangle& bounds);
+    PushPallette( int padding)
+        : column_{ padding}
+        , on_change_{}
+        , active_button_{}
+    {}
 
-    // template <class TObject, typename TExtraArg>
-    // void bind( TObject& object,
-    //            typename xui::Bind<TObject, int, TExtraArg>::Method method,
-    //            TExtraArg targ)
-    // {
-    //     on_change_ = std::make_unique<xui::Bind<TObject, int, TExtraArg>>( object, method, targ);
-    // }
+    void bind( std::function<void( int)>&& func)
+    {
+        on_change_ = std::move( func);
+    }
 
-    void bind( std::function<void( int)>&& func);
     void add( PushButton* button);
 
     void update( int new_state);
     void onChange( bool new_state, int index);
 
-    void draw( sf::RenderTarget& target) const override;
+    const Column<PushButton*>* getColumn() const { return &column_; }
 };
 
-} // namespace xui
+void Render( const PushPallette& pallette, const Geometry& geometry, sf::RenderTarget& target);
 
-#endif // PALLETTE_HH
+LayoutObject Layout( const PushPallette* pallette, const Constraints& cons);
+
+} // namespace xui

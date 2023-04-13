@@ -1,5 +1,4 @@
-#ifndef WIDGET_MANAGER_HH
-#define WIDGET_MANAGER_HH
+#pragma once
 
 #include <vector>
 #include <memory>
@@ -8,75 +7,52 @@
 namespace xui
 {
 
-template <typename T>
 class WidgetManager
-    : public IWidget
 {
-protected:
-    std::vector<T*> widgets_;
-
 public:
-    WidgetManager( const Rectangle& bounds)
-        : IWidget{ bounds}
-        , widgets_{}
+    WidgetManager( sf::Vector2f size)
+        : size_{ size}
     {}
 
-    virtual void add(T* widget)
-    {
-        widgets_.push_back(widget);
-    }
+    sf::Vector2f getSize() const { return size_; }
+    const std::vector<WidgetPtr>& getWidgets() const { return widgets_; }
+    std::vector<WidgetPtr>& getWidgets() { return widgets_; }
 
-    size_t size() const { return widgets_.size(); }
-
-    void draw(sf::RenderTarget& target) const override
-    {
-        this->IWidget::draw(target);
-
-        for (size_t i = 0; i < widgets_.size(); i++)
-            widgets_.at(i)->draw(target);
-    }
-
-    void onMousePressed(const sf::Event& event) override
-    {
-        sf::Vector2f point(event.mouseButton.x, event.mouseButton.y);
-        for (size_t i = 0; i < widgets_.size(); i++)
-            if (widgets_.at(i)->contains(point))
-                widgets_.at(i)->onMousePressed(event);
-    }
-
-    void onMouseReleased(const sf::Event& event) override
-    {
-        sf::Vector2f point(event.mouseButton.x, event.mouseButton.y);
-        for (size_t i = 0; i < widgets_.size(); i++)
-            if (widgets_.at(i)->contains(point))
-                widgets_.at(i)->onMouseReleased(event);
-    }
-
-    void onMouseMoved(const sf::Event& event) override
-    {
-        for (size_t i = 0; i < widgets_.size(); i++)
-            widgets_.at(i)->onMouseMoved(event);
-    }
-
-    void onKeyPressed(const sf::Event& event) override
-    {
-        for (size_t i = 0; i < widgets_.size(); i++)
-            widgets_.at(i)->onKeyPressed(event);
-    }
-
-    void onKeyReleased(const sf::Event& event) override
-    {
-        for (size_t i = 0; i < widgets_.size(); i++)
-            widgets_.at(i)->onKeyReleased(event);
-    }
-
-    void onTextEntered(const sf::Event& event) override
-    {
-        for (size_t i = 0; i < widgets_.size(); i++)
-            widgets_.at(i)->onTextEntered(event);
-    }
+private:
+    sf::Vector2f size_;
+    std::vector<WidgetPtr> widgets_;
 };
 
-} // namespace xui
+inline void
+Render( const WidgetManager&,
+        const Geometry&,
+        sf::RenderTarget&)
+{}
 
-#endif // WIDGET_MANAGER_HH
+inline LayoutObject
+Layout( const WidgetManager* manager,
+        const Constraints& cons)
+{$FUNC
+    LayoutObject object{ manager, manager->getWidgets().size()};
+    object.setSize( cons);
+
+    for ( auto& widget : manager->getWidgets() )
+    {
+        LayoutObject child = Layout( widget, cons);
+
+        assert( child.getSize() <= cons);
+        object.push_back( std::move( child));
+    }
+
+    $M( "returning WidgetManager (%f, %f) (%f, %f)\n", object.getPosition().x, object.getPosition().y, object.getSize().x, object.getSize().y);
+    return object;
+}
+
+void OnMousePressed(  WidgetManager& manager, const sf::Event& event);
+void OnMouseReleased( WidgetManager& manager, const sf::Event& event);
+void OnMouseMoved(    WidgetManager& manager, const sf::Event& event);
+void OnKeyPressed(    WidgetManager& manager, const sf::Event& event);
+void OnKeyReleased(   WidgetManager& manager, const sf::Event& event);
+void OnTextEntered(   WidgetManager& manager, const sf::Event& event);
+
+} // namespace xui
