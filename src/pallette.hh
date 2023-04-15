@@ -11,30 +11,36 @@ class BoolControlRef final
 {
 public:
 
-    // Marking constructor explicit because...
+    //
+    // We have to create copy constructor manually because the instantiated
+    // template version with BoolControlT=BoolControlRef is incorrect.
+    //
+    BoolControlRef( BoolControlRef& other) = default;
+    BoolControlRef( const BoolControlRef& other) = default;
+
     template <typename BoolControlT>
-    explicit BoolControlRef( BoolControlT& control)
+    BoolControlRef( BoolControlT& control)
         : control_{ std::addressof( control)}
         , layout_{ []( void* ctl, const Constraints& cons)
-            {$FUNC
-                auto* tmp = static_cast<const BoolControlT*>( ctl);
-                return Layout( *tmp, cons); // ...this Layout() casts to BoolControlT somehow calls...
-            }}
+                   {$FUNC
+                       auto* tmp = static_cast<const BoolControlT*>( ctl);
+                       return Layout( *tmp, cons);
+                   }}
         , update_{ []( void* ctl, bool val)
-            {
-                auto* tmp = static_cast<BoolControlT*>( ctl);
-                tmp->update( val);
-            }}
+                   {
+                       auto* tmp = static_cast<BoolControlT*>( ctl);
+                       tmp->update( val);
+                   }}
         , bind_{ []( void* ctl, std::function<void( bool)>&& on_change)
-            {
-                auto* tmp = static_cast<BoolControlT*>( ctl);
-                tmp->bind( std::move( on_change));
-            }}
+                 {
+                     auto* tmp = static_cast<BoolControlT*>( ctl);
+                     tmp->bind( std::move( on_change));
+                 }}
         , is_pushed_{ []( void* ctl)
-            {
-                auto* tmp = static_cast<const BoolControlT*>( ctl);
-                return tmp->isPushed();
-            }}
+                      {
+                          auto* tmp = static_cast<const BoolControlT*>( ctl);
+                          return tmp->isPushed();
+                      }}
     {}
 
     void update( bool val)
@@ -52,15 +58,13 @@ public:
         return is_pushed_( control_);
     }
 
-    // ...this Layout().
-    // We need to understand what is going on.
-    // And why this does not happen to Widget::Layout()
     friend LayoutObject Layout( const BoolControlRef& control, const Constraints& cons)
     {$FUNC
         return control.layout_( control.control_, cons);
     }
 
     // using This = void*;
+    // Great idea!
     using LayoutOp = LayoutObject( void*, const Constraints& cons);
     using UpdateOp = void( void*, bool);
     using BindOp = void( void*, std::function<void( bool)>&&);

@@ -47,59 +47,43 @@ public:
     void setGeometry( const Geometry& geometry) { geometry_ = geometry; }
 
 public:
+    LayoutObject( const LayoutObject& other) = delete;
+    LayoutObject& operator=( const LayoutObject& other) = delete;
+
     LayoutObject( LayoutObject&& other) = default;
     LayoutObject& operator=( LayoutObject&& other) = default;
 
 private:
-    struct LayoutObjectConcept
+    static void dbgRenderGeometry( sf::RenderTarget& target, const Geometry& geometry)
     {
-        virtual ~LayoutObjectConcept() = default;
-        virtual void render( sf::RenderTarget& rt, const Geometry& geometry) const = 0;
-    };
-
-    template <typename T>
-    class LayoutObjectModel final
-        : public LayoutObjectConcept
-    {
-    public:
-        LayoutObjectModel( const T& widget)
-            : widget_{ widget}
-        {}
-
-        void render( sf::RenderTarget& target, const Geometry& geometry) const override
-        {
-            fprintf( stderr, "[RENDER]: %10s s: (%4f %4f) p: (%4f %4f)\n", typeid( T).name(),
-                     geometry.size().x, geometry.size().y, geometry.tl().x, geometry.tl().y);
-
-            Render( widget_, geometry, target);
-
-            sf::RectangleShape rectangle;
-            rectangle.setSize( sf::Vector2f{ geometry.size().x, geometry.size().y});
-            rectangle.setFillColor( sf::Color::Transparent);
-            rectangle.setOutlineColor( sf::Color::Red);
-            rectangle.setOutlineThickness( 1);
-            rectangle.setPosition( geometry.tl().x, geometry.tl().y);
-            target.draw( rectangle);
-        }
-
-    private:
-        const T& widget_;
-    };
+        sf::RectangleShape rectangle;
+        rectangle.setSize( sf::Vector2f{ geometry.size().x, geometry.size().y});
+        rectangle.setFillColor( sf::Color::Transparent);
+        rectangle.setOutlineColor( sf::Color::Red);
+        rectangle.setOutlineThickness( 1);
+        rectangle.setPosition( geometry.tl().x, geometry.tl().y);
+        target.draw( rectangle);
+    }
 
 public:
-    using Concept = LayoutObjectConcept;
 
     template <typename T>
-    explicit LayoutObject( const T& widget, const Geometry& geometry = {}, std::size_t prealloc = 0)
-        : impl_buffer_{}
+    LayoutObject( const T& widget, const Geometry& geometry = {}, std::size_t prealloc = 0)
+        : geometry_{ geometry}
+        , widget_{ std::addressof( widget)}
         , children_{}
-        , geometry_{ geometry}
+        , render_{ []( const void* widget, sf::RenderTarget& target, const Geometry& geometry)
+                   {
+                      fprintf( stderr, "[RENDER]: %10s s: (%4f %4f) p: (%4f %4f)\n", typeid( T).name(),
+                               geometry.size().x, geometry.size().y, geometry.tl().x, geometry.tl().y);
+
+                      auto* tmp = static_cast<const T*>( widget);
+                      Render( *tmp, geometry, target);
+
+                      dbgRenderGeometry( target, geometry);
+                   }}
     {
         children_.reserve( prealloc);
-        using Model = LayoutObjectModel<T>;
-        static_assert( sizeof( *this) <= 64, "Cache line size drop!!!");
-        static_assert( sizeof( Model) == sizeof( impl_buffer_), "Size of Model exceed sizeof(impl_buffer_)!" );
-        ::new( impl()) Model{ widget};
     }
 
     template <typename T>
@@ -120,26 +104,21 @@ public:
     friend void
     Render( const LayoutObject& obj, sf::RenderTarget& target)
     {
-        obj.impl()->render( target, obj.geometry_);
+        obj.render_( obj.widget_, target, obj.geometry_);
         for ( auto& child : obj.children_ )
         {
             Render( child, target);
         }
     }
 
+    using RenderOp = void ( const void* self, sf::RenderTarget&, const Geometry&);
+
 private:
-          Concept* impl()       { return reinterpret_cast<      Concept*>( impl_buffer_.data()); }
-    const Concept* impl() const { return reinterpret_cast<const Concept*>( impl_buffer_.data()); }
-
-    // std::array<char, sizeof( LayoutObjectModel<LayoutObject>)> impl_buffer_;
-    //!!!!
-    //!!!!
-    std::array<char, 16> impl_buffer_;
-    //!!!!
-    //!!!!
-
-    std::vector<LayoutObject> children_;
     Geometry geometry_;
+    const void* widget_;
+    std::vector<LayoutObject> children_;
+
+    RenderOp* render_;
 };
 
 } // namespace xui
