@@ -128,6 +128,9 @@ main( int argc,
 
     Render( obj, window);
 
+    std::vector<const void*> clicked{};
+    clicked.reserve( 0x10);
+
     while ( window.isOpen() )
     {
         sf::Event event = {};
@@ -147,6 +150,7 @@ main( int argc,
                     window.setView(sf::View(visibleArea));
                     $$
                     obj = Layout( *gRootWidget, Constraints{event.size.width / 2, event.size.height});
+
                     Adjust( obj);
                 }
                 // case sf::Event::MouseButtonPressed:
@@ -158,14 +162,23 @@ main( int argc,
 
                 //     break;
                 // }
-                // case sf::Event::MouseButtonReleased:
-                // {
-                //     sf::Vector2f mouse_pos{ event.mouseButton.x, event.mouseButton.y};
-                //     if ( gRootWidget.contains( mouse_pos) )
-                //          gRootWidget.onMouseReleased( event);
+                case sf::Event::MouseMoved:
+                {
+                    //sf::Vector2f mouse_pos{ event.mouseButton.x, event.mouseButton.y};
+                    //if ( gRootWidget.contains( mouse_pos) )
+                    //     gRootWidget.onMouseReleased( event);
+                    printf( "Move event\n");
+                    clicked.clear();
+                    std::back_insert_iterator<std::vector<const void*>> it{ clicked};
+                    obj.find( sf::Vector2<float>{ event.mouseMove.x, event.mouseMove.y}, it);
+                    for ( auto addr : clicked )
+                    {
+                        printf( "Moved: %p\n", addr);
+                    }
 
-                //     break;
-                // }
+                    std::fflush( stdout);
+                    break;
+                }
                 // case sf::Event::MouseMoved:
                 // {
                 //     gRootWidget.onMouseMoved( event);
@@ -176,7 +189,6 @@ main( int argc,
                 // {
                 //     gRootWidget.onKeyPressed( event);
 
-                //     break;
                 // }
                 // case sf::Event::KeyReleased:
                 // {
@@ -199,7 +211,6 @@ main( int argc,
         }
 
         window.clear( sf::Color::Black);
-
         Render( obj, window);
         window.display();
     }

@@ -111,6 +111,26 @@ public:
         }
     }
 
+
+    template <typename OutputIt>
+    void find( sf::Vector2<float> point,
+               OutputIt it)
+    {
+        if ( geometry_.contains( point) )
+        {
+            it = widget_;
+
+            for ( auto& child : children_ )
+            {
+                // Double check to reduce recursive calls
+                if ( child.geometry_.contains( point) )
+                {
+                    child.find( point, it);
+                }
+            }
+        }
+    }
+
     using RenderOp = void ( const void* self, sf::RenderTarget&, const Geometry&);
 
 private:
