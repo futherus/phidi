@@ -5,13 +5,6 @@ namespace xui
 {
 
 // void
-// onMousePressed( PushButton& button,
-//                      const sf::Event&)
-// {$FUNC
-//     button.on_click_( !button.is_pushed_);
-// }
-
-// void
 // onMouseMoved( PushButton& button,
 //                    const sf::Event& event)
 // {
@@ -27,11 +20,7 @@ Render( const PushButton& button,
         const Geometry& geometry,
         sf::RenderTarget& target)
 {
-    $M( "Render: Pointer to button: %p\n", &button);
-
-    // $M( "hov: %d, push: %d\n", (int) button.isHovered(), (int) button.isPushed());
     const sf::Texture* texture = button.getTextures().at( button.isHovered()).at( button.isPushed());
-    $M( "Texture: %p\n", texture);
     assert( texture);
 
     sf::Sprite sprite;

@@ -15,7 +15,8 @@ public:
     // We have to create copy constructor manually because the instantiated
     // template version with BoolControlT=BoolControlRef is incorrect.
     //
-    BoolControlRef( BoolControlRef& other) = default;
+    // FIXME: Why we need BoolControlRef&?
+    BoolControlRef( BoolControlRef& other) = delete;
     BoolControlRef( const BoolControlRef& other) = default;
 
     template <typename BoolControlT>

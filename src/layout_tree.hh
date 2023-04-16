@@ -74,13 +74,13 @@ public:
         , children_{}
         , render_{ []( const void* widget, sf::RenderTarget& target, const Geometry& geometry)
                    {
-                      fprintf( stderr, "[RENDER]: %10s s: (%4f %4f) p: (%4f %4f)\n", typeid( T).name(),
-                               geometry.size().x, geometry.size().y, geometry.tl().x, geometry.tl().y);
+                       //   fprintf( stderr, "[RENDER]: %10s s: (%4f %4f) p: (%4f %4f)\n", typeid( T).name(),
+                       //            geometry.size().x, geometry.size().y, geometry.tl().x, geometry.tl().y);
 
-                      auto* tmp = static_cast<const T*>( widget);
-                      Render( *tmp, geometry, target);
+                       auto* tmp = static_cast<const T*>( widget);
+                       Render( *tmp, geometry, target);
 
-                      dbgRenderGeometry( target, geometry);
+                       dbgRenderGeometry( target, geometry);
                    }}
     {
         children_.reserve( prealloc);
@@ -114,7 +114,7 @@ public:
 
     template <typename OutputIt>
     void find( sf::Vector2<float> point,
-               OutputIt it)
+               OutputIt it) const
     {
         if ( geometry_.contains( point) )
         {

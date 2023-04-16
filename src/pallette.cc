@@ -8,7 +8,7 @@ void PushPallette::add( BoolControlRef button)
     size_t sz = column_.getWidgets().size();
     button.bind( [=]( bool val){ this->onChange( val, sz); });
 
-    column_.add( button);
+    column_.add( std::move( button));
 }
 
 void PushPallette::update( int new_state)

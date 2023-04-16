@@ -10,7 +10,7 @@
 #include "resources.h"
 #include "dynloader.hh"
 #include "plugin_registry.hh"
-// #include "event.hh"
+#include "event.hh"
 #include "root.hh"
 #include "column.hh"
 #include "button.hh"
@@ -112,7 +112,7 @@ main( int argc,
     auto* reg = xui::PluginRegistry::instance();
     for ( auto& plugin : plugins )
     {
-        loader->load( plugin["path"]);
+        loader->load( plugin["path"], plugin["name"]);
         reg->getPlugin( plugin["name"])->deserialize( plugin["data"]);
     }
 
@@ -137,6 +137,8 @@ main( int argc,
 
         while ( window.pollEvent( event) )
         {
+            xui::EventManager::instance().handleEvents( obj, event);
+
             switch ( event.type )
             {
                 case sf::Event::Closed:

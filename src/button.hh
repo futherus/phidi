@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <array>
 #include <functional>
+#include "event.hh"
 #include "widget.hh"
 
 namespace xui
@@ -21,8 +22,9 @@ public:
         , is_hovered_{}
     {
         assert( textures_[0][0] && textures_[0][1] && textures_[1][0] && textures_[1][1]);
+
+        EventManager::instance().subOnMousePressed( *this);
         $M( "Button size: (%f, %f)\n", size.x, size.y);
-        // assert( size_ != Vector2f{0, 0});
     }
 
     PushButton( const PushButton&) = delete;
@@ -30,22 +32,15 @@ public:
     PushButton( PushButton&&) = delete;
     PushButton& operator=( PushButton&&) = delete;
 
-    void bind( std::function<void( bool)>&& on_click)
-    {
-        on_click_ = std::move( on_click);
-    }
+    void bind( std::function<void( bool)>&& on_click) {on_click_ = std::move( on_click); }
+    void onMousePressed( sf::Vector2f mouse_pos) const {$FUNC on_click_( !is_pushed_); }
 
     void update( bool val) { is_pushed_ = val; }
 
     bool isPushed() const { return is_pushed_; }
     bool isHovered() const { return is_hovered_; }
     sf::Vector2f getSize() const { return size_; }
-    const TexturePack& getTextures() const
-    {
-        assert( textures_[0][0] && textures_[0][1] && textures_[1][0] && textures_[1][1]);
-        $M( "Textures: %p, %p, %p, %p\n", textures_[0][0], textures_[0][1], textures_[1][0], textures_[1][1]);
-        return textures_;
-    }
+    const TexturePack& getTextures() const { return textures_; }
 
 private:
     TexturePack textures_;
@@ -56,11 +51,9 @@ private:
     bool is_pushed_;
     bool is_hovered_;
     // bool is_focused_;
-
 };
 
-void onMousePressed( const PushButton&, const sf::Event&);
-void onMouseMoved(   const PushButton&, const sf::Event&);
+// void onMouseMoved(   const PushButton&, const sf::Event&);
 
 void Render( const PushButton& button, const Geometry& geometry, sf::RenderTarget& target);
 LayoutObject Layout( const PushButton& button, const Constraints& cons);
