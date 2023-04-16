@@ -14,7 +14,7 @@ PushPallette::add( BoolControlRef&& button)
 
 void
 PushPallette::update( int new_state)
-{$FUNC
+{
     active_button_ = new_state;
 
     for ( size_t i = 0; i < column_.getWidgets().size(); i++ )

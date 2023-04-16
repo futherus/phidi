@@ -49,12 +49,13 @@ public:
         , tool_button2_{}
     {}
 
-    void deserialize( const json& state) override
+    void
+    deserialize( const json& state) override
     {
         // tool_->setColor( state["color"]);
         tool1_->setColor( sf::Color::Red);
         tool1_->setWidth( state["width"]);
-        tool2_->setColor( sf::Color::Red);
+        tool2_->setColor( sf::Color::Blue);
         tool2_->setWidth( state["width"]);
 
         $D( "before adding tool\n");
@@ -85,11 +86,12 @@ public:
         auto tl_pal = tl_pal_plg->getToolPallette();
         $D ( "before adding button\n");
         tl_pal->add( "ToolBrushPlugin::tool1", *tool_button1_);
-        tl_pal->add( "ToolBrushPlugin::tool2", *tool_button1_);
+        tl_pal->add( "ToolBrushPlugin::tool2", *tool_button2_);
         $D ( "after adding button\n");
     }
 
-    void serialize( json& state) override
+    void
+    serialize( json& state) override
     {
         // state["color"] = tool_->getColor();
         // state["width"] = tool_->getWidth();

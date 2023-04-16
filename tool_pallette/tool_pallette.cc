@@ -10,7 +10,6 @@ void
 ToolPallette::update()
 {
     std::string active = tool_manager_->getActive();
-
     for ( auto& p : tool_ids_ )
     {
         if ( p.second == active )
@@ -29,7 +28,7 @@ ToolPallette::add( std::string tool_id,
     $D( "before inserting index pair\n");
     tool_ids_.insert( std::pair<int, std::string>{ getPallette().getColumn().getWidgets().size(), std::move( tool_id)});
 
-    getPallette().add( BoolControlRef{ button});
+    getPallette().add( button);
 }
 
 } // namespace xui

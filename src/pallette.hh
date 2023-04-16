@@ -49,22 +49,14 @@ public:
                       }}
     {}
 
-    void update( bool val)
-    {
-        update_( control_, val);
-    }
+    void update( bool val) { update_( control_, val); }
 
-    void bind( std::function<void( bool)>&& on_click)
-    {
-        bind_( control_, std::move( on_click));
-    }
+    void bind( std::function<void( bool)>&& on_click) { bind_( control_, std::move( on_click)); }
 
-    bool isPushed() const
-    {
-        return is_pushed_( control_);
-    }
+    bool isPushed() const { return is_pushed_( control_); }
 
-    friend LayoutObject Layout( const BoolControlRef& control, const Constraints& cons)
+    friend LayoutObject
+    Layout( const BoolControlRef& control, const Constraints& cons)
     {$FUNC
         return control.layout_( control.control_, cons);
     }

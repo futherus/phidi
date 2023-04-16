@@ -171,14 +171,14 @@ main( int argc,
                     //sf::Vector2f mouse_pos{ event.mouseButton.x, event.mouseButton.y};
                     //if ( gRootWidget.contains( mouse_pos) )
                     //     gRootWidget.onMouseReleased( event);
-                    printf( "Move event\n");
+                    // printf( "Move event\n");
                     clicked.clear();
                     std::back_insert_iterator<std::vector<const void*>> it{ clicked};
                     obj.find( sf::Vector2<float>{ event.mouseMove.x, event.mouseMove.y}, it);
-                    for ( auto addr : clicked )
-                    {
-                        printf( "Moved: %p\n", addr);
-                    }
+                    // for ( auto addr : clicked )
+                    // {
+                    //     printf( "Moved: %p\n", addr);
+                    // }
 
                     std::fflush( stdout);
                     break;

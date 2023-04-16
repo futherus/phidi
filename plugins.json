@@ -20,7 +20,7 @@
         "path" : "./build/toolbrush.so",
         "name" : "ToolBrushPlugin",
         "data" : {
-            "width" : 1.0
+            "width" : 5.0
         }
     }
 ]

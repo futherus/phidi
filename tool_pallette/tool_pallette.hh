@@ -7,12 +7,10 @@ namespace xui
 {
 
 class ToolPallette final
-    : public IView
 {
 public:
     ToolPallette()
-        : IView{}
-        , tool_manager_{}
+        : tool_manager_{}
         , pallette_{ 5}
     {}
 
@@ -24,9 +22,11 @@ public:
         pallette_.bind(
             [&]( int indx){ tool_manager_->setActive( tool_ids_.find( indx)->second); }
         );
+
+        tool_manager->addView( *this);
     }
 
-    void update() override;
+    void update();
 
     void add( std::string tool_id, PushButton& button);
 
@@ -51,6 +51,7 @@ public:
         , tool_pallette_{ std::make_unique<ToolPallette>()}
     {$FUNC
         PluginRegistry::instance()->getPlugin<InitPlugin>()->add( tool_pallette_->getPallette());
+        tool_pallette_->setToolManager( PluginRegistry::instance()->getPlugin<ToolsPlugin>()->getToolManager());
     }
 
     ~ToolPallettePlugin() = default;

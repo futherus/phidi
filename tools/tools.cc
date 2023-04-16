@@ -11,8 +11,8 @@ static RegisterPlugin<xui::ToolsPlugin> X{ "ToolsPlugin"};
 void
 ToolManager::updateViews()
 {
-    for ( auto v : views_ )
-        v->update();
+    for ( auto& v : views_ )
+        v.update();
 }
 
 void
@@ -20,12 +20,22 @@ ToolManager::setActive( const std::string& id)
 {
     // FIXME: is available?
     active_tool_ = id;
+
+    $M( "Active tool: %s\n", id.data());
+    updateViews();
 }
 
 const std::string&
 ToolManager::getActive() const
 {
     return active_tool_;
+}
+
+void
+ToolManager::addView( ViewRef&& view)
+{
+    views_.push_back( std::move( view));
+    updateViews();
 }
 
 void

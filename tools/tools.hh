@@ -11,12 +11,39 @@
 namespace xui
 {
 
-class IView
+class ViewRef
 {
-protected:
-    ~IView() = default;
 public:
-    virtual void update() = 0;
+    ViewRef( const ViewRef& other) = delete;
+    ViewRef& operator=( const ViewRef& other) = delete;
+
+    ViewRef( ViewRef&& other) = default;
+    ViewRef& operator=( ViewRef&& other) = default;
+
+    ~ViewRef() = default;
+
+    //
+    // We have to protect from non-const copy constructor because
+    // the instantiated template version with ViewT=ViewRef is incorrect.
+    //
+    template <typename ViewT,
+              std::enable_if_t<!std::is_same<ViewRef, std::decay_t<ViewT>>::value, bool> = true>
+    ViewRef( ViewT& view)
+        : view_{ std::addressof( view)}
+        , update_{ []( void* view_bytes)
+                   {
+                       auto* tmp = static_cast<ViewT*>( view_bytes);
+                       tmp->update();
+                   }}
+    {}
+
+    void update() { update_( view_); }
+
+private:
+    using UpdateOp = void ( void*);
+
+    void* view_;
+    UpdateOp* update_;
 };
 
 class Canvas;
@@ -50,7 +77,7 @@ private:
     std::vector<ITool*> tools_;
     std::string active_tool_;
 
-    std::vector<IView*> views_;
+    std::vector<ViewRef> views_;
 
     void updateViews();
 
@@ -62,6 +89,8 @@ public:
 
     void addTool( ITool* tool);
     ITool* getActiveTool() const;
+
+    void addView( ViewRef&& view);
 };
 
 class Canvas final
@@ -81,7 +110,6 @@ public:
     Canvas& operator=( const Canvas&) = delete;
     Canvas( Canvas&&) = delete;
     Canvas& operator=( Canvas&&) = delete;
-
 
     void
     init()
