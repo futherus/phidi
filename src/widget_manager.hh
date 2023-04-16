@@ -18,6 +18,7 @@ public:
     WidgetManager& operator=( const WidgetManager&) = delete;
     WidgetManager( WidgetManager&&) = delete;
     WidgetManager& operator=( WidgetManager&&) = delete;
+    ~WidgetManager() = default;
 
     sf::Vector2f getSize() const { return size_; }
     const std::vector<WidgetRef>& getWidgets() const { return widgets_; }

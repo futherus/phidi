@@ -57,10 +57,7 @@ private:
     sf::Vector2<float> tl_;
     sf::Vector2<float> sz_;
 
-    void verify() const
-    {
-        assert( sz_.x > 0 && sz_.y > 0);
-    }
+    void verify() const { assert( sz_.x > 0 && sz_.y > 0); }
 
 public:
     Geometry( const sf::Vector2<float>& tl,
@@ -72,7 +69,8 @@ public:
     }
 
     Geometry()
-        : tl_{ 0, 0}, sz_{ 0, 0}
+        : tl_{ 0, 0}
+        , sz_{ 0, 0}
     {}
 
     float left()   const { return tl_.x; }
@@ -98,7 +96,8 @@ public:
 
     void translate( sf::Vector2<float> shift) { tl_ += shift; verify(); }
 
-    bool contains( sf::Vector2<float> point) const
+    bool
+    contains( sf::Vector2<float> point) const
     {
         return (left() <= point.x && point.x <= right() &&
                 top()  <= point.y && point.y <= bottom());

@@ -8,30 +8,35 @@ namespace xui
 const int ToolsPlugin::ID = 0;
 static RegisterPlugin<xui::ToolsPlugin> X{ "ToolsPlugin"};
 
-void ToolManager::updateViews()
+void
+ToolManager::updateViews()
 {
     for ( auto v : views_ )
         v->update();
 }
 
-void ToolManager::setActive( const std::string& id)
+void
+ToolManager::setActive( const std::string& id)
 {
     // FIXME: is available?
     active_tool_ = id;
 }
 
-const std::string& ToolManager::getActive() const
+const std::string&
+ToolManager::getActive() const
 {
     return active_tool_;
 }
 
-void ToolManager::addTool( ITool* tool)
+void
+ToolManager::addTool( ITool* tool)
 {
     // FIXME: update views or leave it on them?
     tools_.push_back( tool);
 }
 
-ITool* ToolManager::getActiveTool() const
+ITool*
+ToolManager::getActiveTool() const
 {
     // FIXME: store pointer to active tool instead string
     $D( "active_tool_ = %s\n", active_tool_.data());
@@ -53,7 +58,8 @@ ITool* ToolManager::getActiveTool() const
 // void Canvas::onMouseMoved   ( const sf::Event& event) override;
 
 
-void Canvas::clear()
+void
+Canvas::clear()
 {
     is_pressed_ = false;
 
@@ -65,7 +71,8 @@ void Canvas::clear()
     pixels_.display();
 }
 
-void Canvas::drawCircle( sf::Vector2f pos, float radius, sf::Color color)
+void
+Canvas::drawCircle( sf::Vector2f pos, float radius, sf::Color color)
 {
     sf::CircleShape circ{ radius};
     circ.setPosition( pos);
@@ -76,7 +83,8 @@ void Canvas::drawCircle( sf::Vector2f pos, float radius, sf::Color color)
     pixels_.display();
 }
 
-void Canvas::drawLine( sf::Vector2f pos1, sf::Vector2f pos2, float width, sf::Color color)
+void
+Canvas::drawLine( sf::Vector2f pos1, sf::Vector2f pos2, float width, sf::Color color)
 {
     sf::Vertex line[] = { sf::Vertex(pos1), sf::Vertex(pos2) };
     line[0].color = color;

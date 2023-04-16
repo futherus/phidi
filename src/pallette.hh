@@ -1,5 +1,6 @@
 #pragma once
 
+#include <type_traits>
 #include "debug.hh"
 #include "button.hh"
 #include "column.hh"
@@ -10,16 +11,20 @@ namespace xui
 class BoolControlRef final
 {
 public:
+    BoolControlRef( const BoolControlRef& other) = delete;
+    BoolControlRef& operator=( const BoolControlRef& other) = delete;
+
+    BoolControlRef( BoolControlRef&& other) = default;
+    BoolControlRef& operator=( BoolControlRef&& other) = default;
+
+    ~BoolControlRef() = default;
 
     //
-    // We have to create copy constructor manually because the instantiated
-    // template version with BoolControlT=BoolControlRef is incorrect.
+    // We have to protect from non-const copy constructor because
+    // the instantiated template version with BoolControlT=BoolControlRef is incorrect.
     //
-    // FIXME: Why we need BoolControlRef&?
-    BoolControlRef( BoolControlRef& other) = delete;
-    BoolControlRef( const BoolControlRef& other) = default;
-
-    template <typename BoolControlT>
+    template <typename BoolControlT,
+              std::enable_if_t<!std::is_same<BoolControlRef, std::decay_t<BoolControlT>>::value, bool> = true>
     BoolControlRef( BoolControlT& control)
         : control_{ std::addressof( control)}
         , layout_{ []( void* ctl, const Constraints& cons)
@@ -93,13 +98,11 @@ public:
     PushPallette& operator=( const PushPallette&) = delete;
     PushPallette( PushPallette&&) = delete;
     PushPallette& operator=( PushPallette&&) = delete;
+    ~PushPallette() = default;
 
-    void bind( std::function<void( int)>&& func)
-    {
-        on_change_ = std::move( func);
-    }
+    void bind( std::function<void( int)>&& func) { on_change_ = std::move( func); }
 
-    void add( BoolControlRef button);
+    void add( BoolControlRef&& button);
 
     void update( int new_state);
     void onChange( bool new_state, int index);

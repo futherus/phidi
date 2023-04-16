@@ -3,7 +3,8 @@
 namespace xui
 {
 
-void PushPallette::add( BoolControlRef button)
+void
+PushPallette::add( BoolControlRef&& button)
 {
     size_t sz = column_.getWidgets().size();
     button.bind( [=]( bool val){ this->onChange( val, sz); });
@@ -11,7 +12,8 @@ void PushPallette::add( BoolControlRef button)
     column_.add( std::move( button));
 }
 
-void PushPallette::update( int new_state)
+void
+PushPallette::update( int new_state)
 {$FUNC
     active_button_ = new_state;
 
@@ -21,8 +23,9 @@ void PushPallette::update( int new_state)
     column_.getWidgets().at( active_button_).update( true);
 }
 
-void PushPallette::onChange( bool is_pressed,
-                             int button_index)
+void
+PushPallette::onChange( bool is_pressed,
+                        int button_index)
 {
     if ( is_pressed == false )
     {
@@ -34,7 +37,7 @@ void PushPallette::onChange( bool is_pressed,
 }
 
 void
-Render( const PushPallette& pallette,
+Render( const PushPallette&,
         const Geometry& geometry,
         sf::RenderTarget& target)
 {

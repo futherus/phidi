@@ -6,7 +6,8 @@ namespace xui
 const int ToolPallettePlugin::ID = 0;
 static RegisterPlugin<xui::ToolPallettePlugin> X{ "ToolPallettePlugin"};
 
-void ToolPallette::update()
+void
+ToolPallette::update()
 {
     std::string active = tool_manager_->getActive();
 
@@ -20,7 +21,9 @@ void ToolPallette::update()
     }
 }
 
-void ToolPallette::add( std::string tool_id, PushButton& button)
+void
+ToolPallette::add( std::string tool_id,
+                   PushButton& button)
 {
     // FIXME: button ordering is fixed
     $D( "before inserting index pair\n");

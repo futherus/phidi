@@ -26,7 +26,8 @@ public:
 class PluginRegistry
 {
 public:
-    static PluginRegistry* instance()
+    static PluginRegistry*
+    instance()
     {
         static PluginRegistry registry;
 
@@ -38,8 +39,9 @@ public:
      *        to access addPlugin().
      */
     template <typename T>
-    void addPlugin( std::unique_ptr<T> plugin,
-                    std::string name)
+    void
+    addPlugin( std::unique_ptr<T> plugin,
+               std::string name)
     {
         static_assert( std::is_base_of<IPlugin, T>::value
                        && !std::is_same<IPlugin, T>::value,
@@ -55,7 +57,8 @@ public:
     }
 
     template<typename T>
-    T* getPlugin()
+    T*
+    getPlugin()
     {
         static_assert( std::is_base_of<IPlugin, T>::value
                        && !std::is_same<IPlugin, T>::value);
@@ -66,7 +69,8 @@ public:
         return static_cast<T*>( tmp->second.get());
     }
 
-    IPlugin* getPlugin( const std::string& name)
+    IPlugin*
+    getPlugin( const std::string& name)
     {
         auto tmp = plugin_names_.find( name);
         assert( tmp != plugin_names_.end() && "Plugin was not found.");

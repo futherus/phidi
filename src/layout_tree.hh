@@ -53,8 +53,12 @@ public:
     LayoutObject( LayoutObject&& other) = default;
     LayoutObject& operator=( LayoutObject&& other) = default;
 
+    ~LayoutObject() = default;
+
 private:
-    static void dbgRenderGeometry( sf::RenderTarget& target, const Geometry& geometry)
+    static void
+    dbgRenderGeometry( sf::RenderTarget& target,
+                       const Geometry& geometry)
     {
         sf::RectangleShape rectangle;
         rectangle.setSize( sf::Vector2f{ geometry.size().x, geometry.size().y});
@@ -66,43 +70,36 @@ private:
     }
 
 public:
-
     template <typename T>
-    LayoutObject( const T& widget, const Geometry& geometry = {}, std::size_t prealloc = 0)
+    LayoutObject( const T& widget,
+                  const Geometry& geometry = {},
+                  std::size_t prealloc = 0)
         : geometry_{ geometry}
         , widget_{ std::addressof( widget)}
         , children_{}
-        , render_{ []( const void* widget, sf::RenderTarget& target, const Geometry& geometry)
+        , render_{ []( const void* wgt, sf::RenderTarget& target, const Geometry& geom)
                    {
                        //   fprintf( stderr, "[RENDER]: %10s s: (%4f %4f) p: (%4f %4f)\n", typeid( T).name(),
-                       //            geometry.size().x, geometry.size().y, geometry.tl().x, geometry.tl().y);
+                       //            geom.size().x, geom.size().y, geom.tl().x, geom.tl().y);
 
-                       auto* tmp = static_cast<const T*>( widget);
-                       Render( *tmp, geometry, target);
+                       auto* tmp = static_cast<const T*>( wgt);
+                       Render( *tmp, geom, target);
 
-                       dbgRenderGeometry( target, geometry);
+                       dbgRenderGeometry( target, geom);
                    }}
     {
         children_.reserve( prealloc);
     }
 
     template <typename T>
-    explicit LayoutObject( const T& widget, std::size_t prealloc)
+    explicit LayoutObject( const T& widget,
+                           std::size_t prealloc)
         : LayoutObject{ widget, Geometry{}, prealloc}
     {}
 
     friend void
-    Adjust( LayoutObject& obj)
-    {
-        for ( auto& child : obj.children_ )
-        {
-            child.geometry_.translate( obj.geometry_.tl());
-            Adjust( child);
-        }
-    }
-
-    friend void
-    Render( const LayoutObject& obj, sf::RenderTarget& target)
+    Render( const LayoutObject& obj,
+            sf::RenderTarget& target)
     {
         obj.render_( obj.widget_, target, obj.geometry_);
         for ( auto& child : obj.children_ )
@@ -111,10 +108,20 @@ public:
         }
     }
 
+    void
+    adjust()
+    {
+        for ( auto& child : children_ )
+        {
+            child.geometry_.translate( geometry_.tl());
+            child.adjust();
+        }
+    }
 
     template <typename OutputIt>
-    void find( sf::Vector2<float> point,
-               OutputIt it) const
+    void
+    find( sf::Vector2<float> point,
+          OutputIt it) const
     {
         if ( geometry_.contains( point) )
         {

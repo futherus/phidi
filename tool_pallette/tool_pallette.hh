@@ -16,7 +16,8 @@ public:
         , pallette_{ 5}
     {}
 
-    void setToolManager( ToolManager* tool_manager)
+    void
+    setToolManager( ToolManager* tool_manager)
     {
         tool_manager_ = tool_manager;
 
@@ -54,7 +55,8 @@ public:
 
     ~ToolPallettePlugin() = default;
 
-    void deserialize( const json&) override
+    void
+    deserialize( const json&) override
     {
         auto tl_mngr_plg = PluginRegistry::instance()->getPlugin<ToolsPlugin>();
         tool_pallette_->setToolManager( tl_mngr_plg->getToolManager());

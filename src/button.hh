@@ -31,9 +31,10 @@ public:
     PushButton& operator=( const PushButton&) = delete;
     PushButton( PushButton&&) = delete;
     PushButton& operator=( PushButton&&) = delete;
+    ~PushButton() = default;
 
-    void bind( std::function<void( bool)>&& on_click) {on_click_ = std::move( on_click); }
-    void onMousePressed( sf::Vector2f mouse_pos) const {$FUNC on_click_( !is_pushed_); }
+    void bind( std::function<void( bool)>&& on_click) { on_click_ = std::move( on_click); }
+    void onMousePressed( sf::Vector2f /* mouse_pos */) const { on_click_( !is_pushed_); }
 
     void update( bool val) { is_pushed_ = val; }
 

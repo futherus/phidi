@@ -153,7 +153,9 @@ main( int argc,
                     $$
                     obj = Layout( *gRootWidget, Constraints{event.size.width / 2, event.size.height});
 
-                    Adjust( obj);
+                    obj.adjust();
+
+                    break;
                 }
                 // case sf::Event::MouseButtonPressed:
                 // {

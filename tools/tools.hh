@@ -83,7 +83,8 @@ public:
     Canvas& operator=( Canvas&&) = delete;
 
 
-    void init()
+    void
+    init()
     {
         pixels_.create( size_.x, size_.y);
         // sprite_.setTexture( pixels_.getTexture());
@@ -121,7 +122,6 @@ private:
 
 };
 
-
 void Render( const Canvas& canvas, const Geometry& geometry, sf::RenderTarget& target);
 LayoutObject Layout( const Canvas& canvas, const Constraints& cons);
 
@@ -143,7 +143,8 @@ public:
 
     ~ToolsPlugin() = default;
 
-    void deserialize( const json& state) override
+    void
+    deserialize( const json& state) override
     {
         tool_manager_->setActive( state["active_tool"]);
 
@@ -153,7 +154,8 @@ public:
         // canvas_->setBaseColor( state["basecolor"]);
     }
 
-    void serialize( json& state) override
+    void
+    serialize( json& state) override
     {
         state["active_tool"] = tool_manager_->getActive();
 

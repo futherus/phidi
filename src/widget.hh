@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+
 #include "layout_tree.hh"
 #include "debug.hh"
 
@@ -9,14 +11,20 @@ namespace xui
 class WidgetRef final
 {
 public:
-    //
-    // We have to create copy constructor manually because the instantiated
-    // template version with WidgetT=WidgetRef is incorrect.
-    //
-    WidgetRef( WidgetRef& other) = delete;
-    WidgetRef( const WidgetRef& other) = default;
+    WidgetRef( const WidgetRef& other) = delete;
+    WidgetRef& operator=( const WidgetRef& other) = delete;
 
-    template<typename WidgetT>
+    WidgetRef( WidgetRef&& other) = default;
+    WidgetRef& operator=( WidgetRef&& other) = default;
+
+    ~WidgetRef() = default;
+
+    //
+    // We have to protect from non-const copy constructor because
+    // the instantiated template version with BoolControlT=BoolControlRef is incorrect.
+    //
+    template<typename WidgetT,
+             std::enable_if_t<!std::is_same<WidgetRef, std::decay_t<WidgetT>>::value, bool> = true>
     WidgetRef( WidgetT& widget)
         : widget_{ std::addressof( widget) }
         , layout_{ []( void* widget_bytes, const Constraints& cons)
