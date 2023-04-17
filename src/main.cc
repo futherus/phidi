@@ -157,56 +157,6 @@ main( int argc,
 
                     break;
                 }
-                // case sf::Event::MouseButtonPressed:
-                // {
-                //     $D( "mouse pressed\n");
-                //     sf::Vector2f mouse_pos{ event.mouseButton.x, event.mouseButton.y};
-                //     if ( gRootWidget.contains( mouse_pos) )
-                //          gRootWidget.onMousePressed( event);
-
-                //     break;
-                // }
-                case sf::Event::MouseMoved:
-                {
-                    //sf::Vector2f mouse_pos{ event.mouseButton.x, event.mouseButton.y};
-                    //if ( gRootWidget.contains( mouse_pos) )
-                    //     gRootWidget.onMouseReleased( event);
-                    // printf( "Move event\n");
-                    clicked.clear();
-                    std::back_insert_iterator<std::vector<const void*>> it{ clicked};
-                    obj.find( sf::Vector2<float>{ event.mouseMove.x, event.mouseMove.y}, it);
-                    // for ( auto addr : clicked )
-                    // {
-                    //     printf( "Moved: %p\n", addr);
-                    // }
-
-                    std::fflush( stdout);
-                    break;
-                }
-                // case sf::Event::MouseMoved:
-                // {
-                //     gRootWidget.onMouseMoved( event);
-
-                //     break;
-                // }
-                // case sf::Event::KeyPressed:
-                // {
-                //     gRootWidget.onKeyPressed( event);
-
-                // }
-                // case sf::Event::KeyReleased:
-                // {
-                //     gRootWidget.onKeyReleased( event);
-
-                //     break;
-                // }
-
-                // case sf::Event::TextEntered:
-                // {
-                //     gRootWidget.onTextEntered( event);
-
-                //     break;
-                // }
                 default:
                 {
                     break;

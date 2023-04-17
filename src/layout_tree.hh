@@ -46,6 +46,8 @@ public:
     Geometry getGeometry() const { return geometry_; }
     void setGeometry( const Geometry& geometry) { geometry_ = geometry; }
 
+    const void* getWidget() const { return widget_; }
+
 public:
     LayoutObject( const LayoutObject& other) = delete;
     LayoutObject& operator=( const LayoutObject& other) = delete;
@@ -125,7 +127,7 @@ public:
     {
         if ( geometry_.contains( point) )
         {
-            it = widget_;
+            it = this;
 
             for ( auto& child : children_ )
             {

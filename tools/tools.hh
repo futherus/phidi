@@ -104,12 +104,18 @@ public:
         , is_pressed_{}
         , is_hovered_{}
         , is_active_{}
-    {}
+    {
+        $M( "Canvas: %p\n", this);
+        EventManager::instance().subOnMousePressed ( *this);
+        EventManager::instance().subOnMouseReleased( *this);
+        EventManager::instance().subOnMouseMoved   ( *this);
+    }
 
     Canvas( const Canvas&) = delete;
     Canvas& operator=( const Canvas&) = delete;
     Canvas( Canvas&&) = delete;
     Canvas& operator=( Canvas&&) = delete;
+    ~Canvas() = default;
 
     void
     init()
@@ -133,9 +139,9 @@ public:
 
     // void draw( sf::RenderTarget& target) const override;
 
-    // void onMousePressed ( const sf::Event& event) override;
-    // void onMouseReleased( const sf::Event& event) override;
-    // void onMouseMoved   ( const sf::Event& event) override;
+    void onMousePressed ( sf::Vector2f);
+    void onMouseReleased( sf::Vector2f);
+    void onMouseMoved   ( sf::Vector2f);
 
 private:
     sf::Vector2f size_;

@@ -48,7 +48,8 @@ ToolManager::addTool( ITool* tool)
 ITool*
 ToolManager::getActiveTool() const
 {
-    // FIXME: store pointer to active tool instead string
+    // FIXME: Store pointer to active tool instead string.
+    // FIXME: Stub tool to handle case if we have no tools.
     $D( "active_tool_ = %s\n", active_tool_.data());
 
     for ( auto t : tools_ )
@@ -62,11 +63,6 @@ ToolManager::getActiveTool() const
 // void Canvas::drawLine( sf::Vector2f pos1, sf::Vector2f pos2, float width, sf::Color color);
 
 // void Canvas::draw( sf::RenderTarget& target) const override;
-
-// void Canvas::onMousePressed ( const sf::Event& event) override;
-// void Canvas::onMouseReleased( const sf::Event& event) override;
-// void Canvas::onMouseMoved   ( const sf::Event& event) override;
-
 
 void
 Canvas::clear()
@@ -139,31 +135,27 @@ Layout( const Canvas& canvas,
     return object;
 }
 
-// void Canvas::onMousePressed( const sf::Event& event)
-// {
-//     // printf("mouse pressed\n");
-//     //impl(). is_pressed_ = true;
-//     sf::Vector2f pos = {event.mouseButton.x, event.mouseButton.y};
-//     tool_manager_->getActiveTool()->onMousePressed( this, pos - bounds().tl());
+void
+Canvas::onMousePressed( sf::Vector2f rel_pos)
+{
+    // printf("mouse pressed\n");
+    //impl(). is_pressed_ = true;
+    tool_manager_->getActiveTool()->onMousePressed( this, rel_pos);
+}
 
-// }
+void
+Canvas::onMouseReleased( sf::Vector2f rel_pos)
+{
+    // printf("mouse released\n");
+    // is_pressed_ = false;
+    tool_manager_->getActiveTool()->onMouseReleased( this, rel_pos);
+}
 
-// void Canvas::onMouseReleased( const sf::Event& event)
-// {
-//     // printf("mouse released\n");
-//     // is_pressed_ = false;
-//     sf::Vector2f pos = {event.mouseButton.x, event.mouseButton.y};
-//     tool_manager_->getActiveTool()->onMouseReleased( this, pos - bounds().tl());
-
-// }
-
-// void Canvas::onMouseMoved( const sf::Event& event)
-// {
-//     sf::Vector2f pos = {event.mouseMove.x, event.mouseMove.y};
-//     if (!contains( pos))
-//         return;
-
-//     tool_manager_->getActiveTool()->onMouseMoved( this, pos - bounds().tl());
-// }
+void
+Canvas::onMouseMoved( sf::Vector2f rel_pos)
+{
+    if (rel_pos <= Constraints{ size_})
+        tool_manager_->getActiveTool()->onMouseMoved( this, rel_pos);
+}
 
 } // namespace xui

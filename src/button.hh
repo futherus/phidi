@@ -35,7 +35,7 @@ public:
 
     void bind( std::function<void( bool)>&& on_click) { on_click_ = std::move( on_click); }
     void onMousePressed( sf::Vector2f /* mouse_pos */) const { on_click_( !is_pushed_); }
-
+    void onMouseReleased( sf::Vector2f /* mouse_pos */) const {}
     void update( bool val) { is_pushed_ = val; }
 
     bool isPushed() const { return is_pushed_; }
