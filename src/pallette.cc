@@ -4,7 +4,7 @@ namespace xui
 {
 
 void
-PushPallette::add( BoolControlRef&& button)
+PushPallette::add( BoolControlDelegate&& button)
 {
     size_t sz = column_.getWidgets().size();
     button.bind( [=]( bool val){ this->onChange( val, sz); });
@@ -52,10 +52,12 @@ LayoutObject
 Layout( const PushPallette& pallette,
         const Constraints& cons)
 {$FUNC
-    LayoutObject object{ pallette, Geometry{{}, cons}, 1};
+    LayoutObject object{ pallette, 1};
 
     $$
     object.push_back( Layout( pallette.getColumn(), cons));
+
+    object.setSize( object.back().getSize());
 
     $M( "returning PushPallette (%f, %f) (%f, %f)\n", object.getPosition().x, object.getPosition().y, object.getSize().x, object.getSize().y);
     return object;

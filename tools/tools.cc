@@ -32,7 +32,7 @@ ToolManager::getActive() const
 }
 
 void
-ToolManager::addView( ViewRef&& view)
+ToolManager::addView( ToolManagerViewDelegate&& view)
 {
     views_.push_back( std::move( view));
     updateViews();

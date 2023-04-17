@@ -11,24 +11,24 @@
 namespace xui
 {
 
-class ViewRef
+class ToolManagerViewDelegate
 {
 public:
-    ViewRef( const ViewRef& other) = delete;
-    ViewRef& operator=( const ViewRef& other) = delete;
+    ToolManagerViewDelegate( const ToolManagerViewDelegate& other) = delete;
+    ToolManagerViewDelegate& operator=( const ToolManagerViewDelegate& other) = delete;
 
-    ViewRef( ViewRef&& other) = default;
-    ViewRef& operator=( ViewRef&& other) = default;
+    ToolManagerViewDelegate( ToolManagerViewDelegate&& other) = default;
+    ToolManagerViewDelegate& operator=( ToolManagerViewDelegate&& other) = default;
 
-    ~ViewRef() = default;
+    ~ToolManagerViewDelegate() = default;
 
     //
     // We have to protect from non-const copy constructor because
-    // the instantiated template version with ViewT=ViewRef is incorrect.
+    // the instantiated template version with ViewT=ToolManagerViewDelegate is incorrect.
     //
     template <typename ViewT,
-              std::enable_if_t<!std::is_same<ViewRef, std::decay_t<ViewT>>::value, bool> = true>
-    ViewRef( ViewT& view)
+              std::enable_if_t<!std::is_same<ToolManagerViewDelegate, std::decay_t<ViewT>>::value, bool> = true>
+    ToolManagerViewDelegate( ViewT& view)
         : view_{ std::addressof( view)}
         , update_{ []( void* view_bytes)
                    {
@@ -77,7 +77,7 @@ private:
     std::vector<ITool*> tools_;
     std::string active_tool_;
 
-    std::vector<ViewRef> views_;
+    std::vector<ToolManagerViewDelegate> views_;
 
     void updateViews();
 
@@ -90,7 +90,7 @@ public:
     void addTool( ITool* tool);
     ITool* getActiveTool() const;
 
-    void addView( ViewRef&& view);
+    void addView( ToolManagerViewDelegate&& view);
 };
 
 class Canvas final

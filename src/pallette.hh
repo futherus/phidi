@@ -8,41 +8,48 @@
 namespace xui
 {
 
-class BoolControlRef final
+class BoolControlDelegate final
 {
 public:
-    BoolControlRef( const BoolControlRef& other) = delete;
-    BoolControlRef& operator=( const BoolControlRef& other) = delete;
+    using This = void*;
+    using LayoutOp = LayoutObject( This, const Constraints& cons);
+    using UpdateOp = void( This, bool);
+    using BindOp = void( This, std::function<void( bool)>&&);
+    using IsPushedOp = bool( This);
 
-    BoolControlRef( BoolControlRef&& other) = default;
-    BoolControlRef& operator=( BoolControlRef&& other) = default;
+public:
+    BoolControlDelegate( const BoolControlDelegate& other) = delete;
+    BoolControlDelegate& operator=( const BoolControlDelegate& other) = delete;
 
-    ~BoolControlRef() = default;
+    BoolControlDelegate( BoolControlDelegate&& other) = default;
+    BoolControlDelegate& operator=( BoolControlDelegate&& other) = default;
+
+    ~BoolControlDelegate() = default;
 
     //
-    // We have to protect from non-const copy constructor because
-    // the instantiated template version with BoolControlT=BoolControlRef is incorrect.
+    // We have to protect from non-const copy constructor because the
+    // instantiated template version with BoolControlT=BoolControlDelegate is incorrect.
     //
     template <typename BoolControlT,
-              std::enable_if_t<!std::is_same<BoolControlRef, std::decay_t<BoolControlT>>::value, bool> = true>
-    BoolControlRef( BoolControlT& control)
+              std::enable_if_t<!std::is_same<BoolControlDelegate, std::decay_t<BoolControlT>>::value, bool> = true>
+    BoolControlDelegate( BoolControlT& control)
         : control_{ std::addressof( control)}
-        , layout_{ []( void* ctl, const Constraints& cons)
+        , layout_{ []( This ctl, const Constraints& cons)
                    {$FUNC
                        auto* tmp = static_cast<const BoolControlT*>( ctl);
                        return Layout( *tmp, cons);
                    }}
-        , update_{ []( void* ctl, bool val)
+        , update_{ []( This ctl, bool val)
                    {
                        auto* tmp = static_cast<BoolControlT*>( ctl);
                        tmp->update( val);
                    }}
-        , bind_{ []( void* ctl, std::function<void( bool)>&& on_change)
+        , bind_{ []( This ctl, std::function<void( bool)>&& on_change)
                  {
                      auto* tmp = static_cast<BoolControlT*>( ctl);
                      tmp->bind( std::move( on_change));
                  }}
-        , is_pushed_{ []( void* ctl)
+        , is_pushed_{ []( This ctl)
                       {
                           auto* tmp = static_cast<const BoolControlT*>( ctl);
                           return tmp->isPushed();
@@ -56,20 +63,13 @@ public:
     bool isPushed() const { return is_pushed_( control_); }
 
     friend LayoutObject
-    Layout( const BoolControlRef& control, const Constraints& cons)
+    Layout( const BoolControlDelegate& control, const Constraints& cons)
     {$FUNC
         return control.layout_( control.control_, cons);
     }
 
-    // using This = void*;
-    // Great idea!
-    using LayoutOp = LayoutObject( void*, const Constraints& cons);
-    using UpdateOp = void( void*, bool);
-    using BindOp = void( void*, std::function<void( bool)>&&);
-    using IsPushedOp = bool( void*);
-
 private:
-    void* control_;
+    This control_;
 
     LayoutOp* layout_;
     UpdateOp* update_;
@@ -81,7 +81,7 @@ class PushPallette final
 {
 public:
     PushPallette( int padding)
-        : column_{ padding}
+        : column_{ padding, {MainAxisAlignment::Center, CrossAxisAlignment::Center}}
         , on_change_{}
         , active_button_{}
     {}
@@ -94,16 +94,16 @@ public:
 
     void bind( std::function<void( int)>&& func) { on_change_ = std::move( func); }
 
-    void add( BoolControlRef&& button);
+    void add( BoolControlDelegate&& button);
 
     void update( int new_state);
     void onChange( bool new_state, int index);
 
-    const Column<BoolControlRef>& getColumn() const { return column_; }
-          Column<BoolControlRef>& getColumn()       { return column_; }
+    const Column<BoolControlDelegate>& getColumn() const { return column_; }
+          Column<BoolControlDelegate>& getColumn()       { return column_; }
 
 private:
-    Column<BoolControlRef> column_;
+    Column<BoolControlDelegate> column_;
     std::function<void( int)> on_change_;
     int active_button_;
 };

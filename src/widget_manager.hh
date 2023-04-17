@@ -21,12 +21,12 @@ public:
     ~WidgetManager() = default;
 
     sf::Vector2f getSize() const { return size_; }
-    const std::vector<WidgetRef>& getWidgets() const { return widgets_; }
-          std::vector<WidgetRef>& getWidgets()       { return widgets_; }
+    const std::vector<LayoutDelegate>& getWidgets() const { return widgets_; }
+          std::vector<LayoutDelegate>& getWidgets()       { return widgets_; }
 
 private:
     sf::Vector2f size_;
-    std::vector<WidgetRef> widgets_;
+    std::vector<LayoutDelegate> widgets_;
 };
 
 inline void

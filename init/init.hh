@@ -13,14 +13,14 @@ class InitPlugin final
     : public IPlugin
 {
 private:
-    std::unique_ptr<Column<WidgetRef>> manager_;
+    std::unique_ptr<Column<LayoutDelegate>> manager_;
 
 public:
     static const int ID;
 
     InitPlugin()
         : IPlugin{}
-        , manager_{ std::make_unique<Column<WidgetRef>>( 10)}
+        , manager_{ std::make_unique<Column<LayoutDelegate>>( 10, LayoutPolicy{MainAxisAlignment::Center, CrossAxisAlignment::Center})}
     {
         gRootWidget->getWidgets().push_back( *manager_);
     }
@@ -37,7 +37,7 @@ public:
     void serialize( json&) override {}
 
     void
-    add( WidgetRef&& widget)
+    add( LayoutDelegate&& widget)
     {
         // FIXME: Find in serialization.
         manager_->getWidgets().push_back( std::move( widget));

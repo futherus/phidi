@@ -16,6 +16,9 @@ namespace xui
 class LayoutObject final
 {
 public:
+    using This = const void*;
+    using RenderOp = void ( This, sf::RenderTarget&, const Geometry&);
+
     using ObjectList = std::vector<LayoutObject>;
 
     using iterator = ObjectList::iterator;
@@ -79,7 +82,7 @@ public:
         : geometry_{ geometry}
         , widget_{ std::addressof( widget)}
         , children_{}
-        , render_{ []( const void* wgt, sf::RenderTarget& target, const Geometry& geom)
+        , render_{ []( This wgt, sf::RenderTarget& target, const Geometry& geom)
                    {
                        //   fprintf( stderr, "[RENDER]: %10s s: (%4f %4f) p: (%4f %4f)\n", typeid( T).name(),
                        //            geom.size().x, geom.size().y, geom.tl().x, geom.tl().y);
@@ -140,11 +143,9 @@ public:
         }
     }
 
-    using RenderOp = void ( const void* self, sf::RenderTarget&, const Geometry&);
-
 private:
     Geometry geometry_;
-    const void* widget_;
+    This widget_;
     std::vector<LayoutObject> children_;
 
     RenderOp* render_;

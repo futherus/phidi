@@ -8,42 +8,44 @@
 namespace xui
 {
 
-class WidgetRef final
+class LayoutDelegate final
 {
 public:
-    WidgetRef( const WidgetRef& other) = delete;
-    WidgetRef& operator=( const WidgetRef& other) = delete;
+    using This = void*;
+    using LayoutOperation = LayoutObject( This, const Constraints& cons);
 
-    WidgetRef( WidgetRef&& other) = default;
-    WidgetRef& operator=( WidgetRef&& other) = default;
+public:
+    LayoutDelegate( const LayoutDelegate& other) = delete;
+    LayoutDelegate& operator=( const LayoutDelegate& other) = delete;
 
-    ~WidgetRef() = default;
+    LayoutDelegate( LayoutDelegate&& other) = default;
+    LayoutDelegate& operator=( LayoutDelegate&& other) = default;
+
+    ~LayoutDelegate() = default;
 
     //
     // We have to protect from non-const copy constructor because
-    // the instantiated template version with BoolControlT=BoolControlRef is incorrect.
+    // the instantiated template version with LayoutableT=LayoutDelegate is incorrect.
     //
-    template<typename WidgetT,
-             std::enable_if_t<!std::is_same<WidgetRef, std::decay_t<WidgetT>>::value, bool> = true>
-    WidgetRef( WidgetT& widget)
+    template<typename LayoutableT,
+             std::enable_if_t<!std::is_same<LayoutDelegate, std::decay_t<LayoutableT>>::value, bool> = true>
+    LayoutDelegate( LayoutableT& widget)
         : widget_{ std::addressof( widget) }
-        , layout_{ []( void* widget_bytes, const Constraints& cons)
+        , layout_{ []( This widget_bytes, const Constraints& cons)
                    {$FUNC
-                       auto* tmp = static_cast<WidgetT*>( widget_bytes);
+                       auto* tmp = static_cast<LayoutableT*>( widget_bytes);
                        return Layout( *tmp, cons);
                    }}
     {}
 
     friend LayoutObject
-    Layout( const WidgetRef& widget, const Constraints& cons)
+    Layout( const LayoutDelegate& widget, const Constraints& cons)
     {$FUNC
         return widget.layout_( widget.widget_, cons);
     }
 
 private:
-    using LayoutOperation = LayoutObject( void*, const Constraints& cons);
-
-    void* widget_;
+    This widget_;
     LayoutOperation* layout_;
 };
 
