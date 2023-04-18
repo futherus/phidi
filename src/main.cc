@@ -7,6 +7,7 @@
 #include <getopt.h>
 #include <stdexcept>
 
+#include "lru_cache.hh"
 #include "resources.h"
 #include "dynloader.hh"
 #include "plugin_registry.hh"

@@ -10,6 +10,7 @@ target_sources( phi
         main.cc
 
     PUBLIC
+        lru_cache.hh
         button.hh
         debug.hh
         dynloader.hh
