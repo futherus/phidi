@@ -2,7 +2,22 @@
     {
         "path" : "./build/init.so",
         "name" : "InitPlugin",
-        "data" : {}
+        "data" : {
+            "widget_root" : {
+                "type" : "Column",
+                "policy" : "...",
+                "widgets" : [
+                    {
+                        "type" : "IPlugin",
+                        "name" : "ToolsPlugin"
+                    },
+                    {
+                        "type" : "IPlugin",
+                        "name" : "ToolPallettePlugin"
+                    }
+                ]
+            }
+        }
     },
     {
         "path" : "./build/tools.so",

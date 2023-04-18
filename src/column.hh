@@ -30,7 +30,31 @@ template<typename T>
 class Column final
 {
 public:
-    Column( int padding, LayoutPolicy layout_policy)
+    using value_type = T;
+    using size_type = size_t;
+    using container = std::vector<value_type>;
+    using iterator = typename container::iterator;
+    using const_iterator = typename container::const_iterator;
+
+    iterator          begin()                   { return widgets_.begin(); }
+    const_iterator    begin()             const { return widgets_.begin(); }
+    iterator            end()                   { return widgets_.end();   }
+    const_iterator      end()             const { return widgets_.end();   }
+
+    size_type          size()             const { return widgets_.size();  }
+    bool              empty()             const { return widgets_.empty(); }
+          value_type& front()                   { return widgets_.front(); }
+    const value_type& front()             const { return widgets_.front(); }
+          value_type&  back()                   { return widgets_.back();  }
+    const value_type&  back()             const { return widgets_.back();  }
+          value_type&    at( size_type i)       { return widgets_.at( i);  }
+    const value_type&    at( size_type i) const { return widgets_.at( i);  }
+
+    void push_back( value_type&& widget) { widgets_.push_back( std::move( widget)); }
+
+public:
+    Column( int padding,
+            LayoutPolicy layout_policy)
         : padding_{ padding}
         , layout_policy_{ layout_policy}
         , widgets_{}
@@ -42,16 +66,14 @@ public:
     Column& operator=( Column&&) = delete;
     ~Column() = default;
 
+public:
     int getPadding() const { return padding_; }
     LayoutPolicy getLayoutPolicy() const { return layout_policy_; }
-    const std::vector<T>& getWidgets() const { return widgets_; }
-    std::vector<T>& getWidgets() { return widgets_; }
-    void add( T&& widget) { widgets_.push_back( std::move( widget)); }
 
 private:
     int padding_;
     LayoutPolicy layout_policy_;
-    std::vector<T> widgets_;
+    container widgets_;
 };
 
 template<typename T>
@@ -66,7 +88,7 @@ inline LayoutObject
 Layout( const Column<T>& column,
         const Constraints& cons)
 {$FUNC
-    size_t n_widgets = column.getWidgets().size();
+    size_t n_widgets = column.size();
     LayoutObject object{ column, n_widgets};
 
     const float padding = column.getPadding();
@@ -76,7 +98,7 @@ Layout( const Column<T>& column,
     float xspace = cons.width() - 2 * padding;
     float col_width = 100;
 
-    for ( const T& widget : column.getWidgets() )
+    for ( const T& widget : column )
     {
         LayoutObject child = Layout( widget, Constraints{ xspace, vspace});
 
@@ -89,7 +111,6 @@ Layout( const Column<T>& column,
 
         object.push_back( std::move( child));
     }
-    $M( "vspace = %f\n", vspace);
 
     const float step = (vspace + n_widgets * padding) / (object.size() + 1);
     int i = 1;
@@ -120,40 +141,6 @@ Layout( const Column<T>& column,
     col_width += 2 * padding;
 
     object.setSize( sf::Vector2f{ col_width, cons.height()});
-/*
-    Constraints space_left{ sf::Vector2f{cons} - sf::Vector2f{0, 2 * column.getPadding()}};
-    sf::Vector2f position{ 0, column.getPadding()};
-    for ( const T& widget : column.getWidgets() )
-    {
-        $$
-        LayoutObject child = Layout( widget, space_left);
-        assert( space_left >= child.getSize());
-        $$
-
-        sf::Vector2f s = child.getSize();
-        sf::Vector2f p = child.getPosition();
-        Geometry g{ child.getGeometry()};
-        $M( "Child: (%f, %f) (%f, %f)\n", g.tl().x, g.tl().y, g.size().x, g.size().y);
-        $M( "Child: (%f, %f) (%f, %f)\n", p.x, p.y, s.x, s.y);
-
-        child.setPosition( position);
-
-        s = child.getSize();
-        p = child.getPosition();
-        g = child.getGeometry();
-        $M( "Child: (%f, %f) (%f, %f)\n", g.tl().x, g.tl().y, g.size().x, g.size().y);
-        $M( "Child: (%f, %f) (%f, %f)\n", p.x, p.y, s.x, s.y);
-
-        space_left -= {0, child.getSize().y + column.getPadding()};
-        position.y += child.getSize().y + column.getPadding();
-
-        $$
-        object.push_back( std::move( child));
-        $$
-    }
-
-    object.setSize( {cons.width(), position.y});
-*/
     $M( "Returning Column<T> (%f, %f) (%f, %f)\n", object.getPosition().x, object.getPosition().y, object.getSize().x, object.getSize().y);
     return object;
 }

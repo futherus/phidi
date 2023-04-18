@@ -92,6 +92,7 @@ public:
     PushPallette& operator=( PushPallette&&) = delete;
     ~PushPallette() = default;
 
+public:
     void bind( std::function<void( int)>&& func) { on_change_ = std::move( func); }
 
     void add( BoolControlDelegate&& button);

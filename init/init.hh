@@ -22,7 +22,7 @@ public:
         : IPlugin{}
         , manager_{ std::make_unique<Column<LayoutDelegate>>( 10, LayoutPolicy{MainAxisAlignment::Center, CrossAxisAlignment::Center})}
     {
-        gRootWidget->getWidgets().push_back( *manager_);
+        gRootWidget->push_back( *manager_);
     }
 
     ~InitPlugin() = default;
@@ -40,7 +40,7 @@ public:
     add( LayoutDelegate&& widget)
     {
         // FIXME: Find in serialization.
-        manager_->getWidgets().push_back( std::move( widget));
+        manager_->push_back( std::move( widget));
     }
 };
 

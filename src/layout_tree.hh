@@ -16,13 +16,10 @@ namespace xui
 class LayoutObject final
 {
 public:
-    using This = const void*;
-    using RenderOp = void ( This, sf::RenderTarget&, const Geometry&);
+    using container = std::vector<LayoutObject>;
 
-    using ObjectList = std::vector<LayoutObject>;
-
-    using iterator = ObjectList::iterator;
-    using const_iterator = ObjectList::const_iterator;
+    using iterator = container::iterator;
+    using const_iterator = container::const_iterator;
 
     iterator            begin()       { return children_.begin(); }
     const_iterator      begin() const { return children_.begin(); }
@@ -36,20 +33,11 @@ public:
           LayoutObject&  back()       { return children_.back();  }
     const LayoutObject&  back() const { return children_.back();  }
 
-    void push_back(       LayoutObject&& value) { children_.push_back( std::move( value)); }
-    //void push_back( const LayoutObject&  value) { children_.push_back( value);             }
+    void push_back( LayoutObject&& value) { children_.push_back( std::move( value)); }
 
 public:
-    sf::Vector2f getSize() const { return geometry_.size(); }
-    void setSize( const sf::Vector2f& size) { geometry_.setSize( size); }
-
-    sf::Vector2f getPosition() const { return geometry_.tl(); }
-    void setPosition( const sf::Vector2f& position) { geometry_.setTopLeft( position); }
-
-    Geometry getGeometry() const { return geometry_; }
-    void setGeometry( const Geometry& geometry) { geometry_ = geometry; }
-
-    const void* getWidget() const { return widget_; }
+    using This = const void*;
+    using RenderOp = void ( This, sf::RenderTarget&, const Geometry&);
 
 public:
     LayoutObject( const LayoutObject& other) = delete;
@@ -60,21 +48,6 @@ public:
 
     ~LayoutObject() = default;
 
-private:
-    static void
-    dbgRenderGeometry( sf::RenderTarget& target,
-                       const Geometry& geometry)
-    {
-        sf::RectangleShape rectangle;
-        rectangle.setSize( sf::Vector2f{ geometry.size().x, geometry.size().y});
-        rectangle.setFillColor( sf::Color::Transparent);
-        rectangle.setOutlineColor( sf::Color::Red);
-        rectangle.setOutlineThickness( 1);
-        rectangle.setPosition( geometry.tl().x, geometry.tl().y);
-        target.draw( rectangle);
-    }
-
-public:
     template <typename T>
     LayoutObject( const T& widget,
                   const Geometry& geometry = {},
@@ -113,6 +86,7 @@ public:
         }
     }
 
+public:
     void
     adjust()
     {
@@ -143,10 +117,35 @@ public:
         }
     }
 
+    sf::Vector2f getSize() const { return geometry_.size(); }
+    void setSize( const sf::Vector2f& size) { geometry_.setSize( size); }
+
+    sf::Vector2f getPosition() const { return geometry_.tl(); }
+    void setPosition( const sf::Vector2f& position) { geometry_.setTopLeft( position); }
+
+    Geometry getGeometry() const { return geometry_; }
+    void setGeometry( const Geometry& geometry) { geometry_ = geometry; }
+
+    const void* getWidget() const { return widget_; }
+
+private:
+    static void
+    dbgRenderGeometry( sf::RenderTarget& target,
+                       const Geometry& geometry)
+    {
+        sf::RectangleShape rectangle;
+        rectangle.setSize( sf::Vector2f{ geometry.size().x, geometry.size().y});
+        rectangle.setFillColor( sf::Color::Transparent);
+        rectangle.setOutlineColor( sf::Color::Red);
+        rectangle.setOutlineThickness( 1);
+        rectangle.setPosition( geometry.tl().x, geometry.tl().y);
+        target.draw( rectangle);
+    }
+
 private:
     Geometry geometry_;
     This widget_;
-    std::vector<LayoutObject> children_;
+    container children_;
 
     RenderOp* render_;
 };

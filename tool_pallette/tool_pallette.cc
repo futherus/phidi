@@ -26,7 +26,7 @@ ToolPallette::add( std::string tool_id,
 {
     // FIXME: button ordering is fixed
     $D( "before inserting index pair\n");
-    tool_ids_.insert( std::pair<int, std::string>{ getPallette().getColumn().getWidgets().size(), std::move( tool_id)});
+    tool_ids_.insert( std::pair<int, std::string>{ getPallette().getColumn().size(), std::move( tool_id)});
 
     getPallette().add( button);
 }

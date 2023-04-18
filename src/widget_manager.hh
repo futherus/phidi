@@ -10,6 +10,29 @@ namespace xui
 class WidgetManager
 {
 public:
+    using value_type = LayoutDelegate;
+    using size_type = size_t;
+    using container = std::vector<value_type>;
+    using iterator = typename container::iterator;
+    using const_iterator = typename container::const_iterator;
+
+    iterator          begin()                   { return widgets_.begin(); }
+    const_iterator    begin()             const { return widgets_.begin(); }
+    iterator            end()                   { return widgets_.end();   }
+    const_iterator      end()             const { return widgets_.end();   }
+
+    size_type          size()             const { return widgets_.size();  }
+    bool              empty()             const { return widgets_.empty(); }
+          value_type& front()                   { return widgets_.front(); }
+    const value_type& front()             const { return widgets_.front(); }
+          value_type&  back()                   { return widgets_.back();  }
+    const value_type&  back()             const { return widgets_.back();  }
+          value_type&    at( size_type i)       { return widgets_.at( i);  }
+    const value_type&    at( size_type i) const { return widgets_.at( i);  }
+
+    void push_back( value_type&& widget) { widgets_.push_back( std::move( widget)); }
+
+public:
     WidgetManager( sf::Vector2f size)
         : size_{ size}
     {}
@@ -20,13 +43,12 @@ public:
     WidgetManager& operator=( WidgetManager&&) = delete;
     ~WidgetManager() = default;
 
+public:
     sf::Vector2f getSize() const { return size_; }
-    const std::vector<LayoutDelegate>& getWidgets() const { return widgets_; }
-          std::vector<LayoutDelegate>& getWidgets()       { return widgets_; }
 
 private:
     sf::Vector2f size_;
-    std::vector<LayoutDelegate> widgets_;
+    container widgets_;
 };
 
 inline void
@@ -39,10 +61,10 @@ inline LayoutObject
 Layout( const WidgetManager& manager,
         const Constraints& cons)
 {$FUNC
-    LayoutObject object{ manager, manager.getWidgets().size()};
+    LayoutObject object{ manager, manager.size()};
     object.setSize( cons);
 
-    for ( auto& widget : manager.getWidgets() )
+    for ( auto& widget : manager )
     {
         LayoutObject child = Layout( widget, cons);
 

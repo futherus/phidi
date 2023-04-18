@@ -10,9 +10,8 @@
 #define CYAN "\u001b[36m"
 #define WHITE "\u001b[37m"
 
-#define $M(FMT, ...) std::fprintf(stderr, BLUE "MSG: " RESET FMT, ##__VA_ARGS__)
-
 #ifndef NDEBUG
+    #define $M(FMT, ...) std::fprintf(stderr, BLUE "MSG: " RESET FMT, ##__VA_ARGS__)
     #define $$ std::fprintf(stderr, BLUE "\t " RESET "%s:%d %s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__);
     #define $D(FMT, ...) std::fprintf(stderr, MAGENTA "DBG: " RESET FMT, ##__VA_ARGS__)
     #ifndef NFUNC
@@ -21,6 +20,7 @@
         #define $FUNC
     #endif
 #else
+    #define $M
     #define $FUNC
     #define $$
     #define $D(FMT, ...)

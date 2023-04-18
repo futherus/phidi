@@ -14,6 +14,7 @@ class PushButton final
 public:
     using TexturePack = std::array<std::array<const sf::Texture*, 2>, 2>;
 
+public:
     PushButton( TexturePack textures, sf::Vector2f size)
         : textures_{ std::move( textures)}
         , on_click_{}
@@ -33,6 +34,7 @@ public:
     PushButton& operator=( PushButton&&) = delete;
     ~PushButton() = default;
 
+public:
     void bind( std::function<void( bool)>&& on_click) { on_click_ = std::move( on_click); }
     void onMousePressed( sf::Vector2f /* mouse_pos */) const { on_click_( !is_pushed_); }
     void onMouseReleased( sf::Vector2f /* mouse_pos */) const {}

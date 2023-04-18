@@ -6,10 +6,10 @@ namespace xui
 void
 PushPallette::add( BoolControlDelegate&& button)
 {
-    size_t sz = column_.getWidgets().size();
+    size_t sz = column_.size();
     button.bind( [=]( bool val){ this->onChange( val, sz); });
 
-    column_.add( std::move( button));
+    column_.push_back( std::move( button));
 }
 
 void
@@ -17,10 +17,10 @@ PushPallette::update( int new_state)
 {
     active_button_ = new_state;
 
-    for ( size_t i = 0; i < column_.getWidgets().size(); i++ )
-        column_.getWidgets().at( i).update( false);
+    for ( auto& button : column_ )
+        button.update( false);
 
-    column_.getWidgets().at( active_button_).update( true);
+    column_.at( active_button_).update( true);
 }
 
 void
