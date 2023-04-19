@@ -24,6 +24,10 @@ include( CMakePrintHelpers )
 
 project( phidi LANGUAGES CXX )
 
+if( POLICY CMP0076 )
+    cmake_policy( SET CMP0076 NEW )
+endif()
+
 set( CMAKE_BUILD_TYPE Debug )
 
 set( CMAKE_CXX_STANDARD 14 )
@@ -67,12 +71,23 @@ set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 #
 # https://cmake.org/cmake/help/latest/command/file.html#glob
 # -----------------------------------------------------------------------------
-add_subdirectory( src )
 
-add_subdirectory( toolbrush )
-add_subdirectory( tool_pallette )
-add_subdirectory( tools )
-add_subdirectory( init )
-add_subdirectory( textures )
+add_subdirectory( plugins/init )
+add_subdirectory( plugins/textures )
+add_subdirectory( plugins/tools )
+add_subdirectory( plugins/toolbrush )
+add_subdirectory( plugins/tool_pallette )
 
+add_executable( phi main.cc )
+target_include_directories( phi PUBLIC ${PROJECT_SOURCE_DIR} )
 
+add_subdirectory( core )
+add_subdirectory( widgets )
+
+target_link_libraries( phi
+    PUBLIC
+        widgets
+    PRIVATE
+        core
+        sfml-graphics
+)

@@ -1,1 +1,0 @@
-OBJ += lot/main.o
