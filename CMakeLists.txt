@@ -73,5 +73,6 @@ add_subdirectory( toolbrush )
 add_subdirectory( tool_pallette )
 add_subdirectory( tools )
 add_subdirectory( init )
+add_subdirectory( textures )
 
 

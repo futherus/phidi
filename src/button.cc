@@ -25,6 +25,8 @@ Render( const PushButton& button,
 
     sf::Sprite sprite;
     sprite.setTexture( *texture, true);
+    sprite.setTextureRect( sf::IntRect{ 0, 0, geometry.width(),
+                                              geometry.height() });
     sprite.setPosition( geometry.tl());
 
     target.draw( sprite);

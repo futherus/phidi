@@ -2,6 +2,7 @@
 
 #include "../tools/tools.hh"
 #include "../tool_pallette/tool_pallette.hh"
+#include "../textures/textures.hh"
 
 namespace xui
 {
@@ -65,10 +66,13 @@ public:
         tl_mngr->addTool( tool2_.get());
 
         $D( "before creating button\n");
-        const sf::Texture* ph = gui::TextureFactory::getTexture("ph");
-        const sf::Texture* Ph = gui::TextureFactory::getTexture("Ph");
-        const sf::Texture* pH = gui::TextureFactory::getTexture("pH");
-        const sf::Texture* PH = gui::TextureFactory::getTexture("PH");
+
+        auto textures_cache = PluginRegistry::instance()->getPlugin<TexturesPlugin>();
+        const sf::Texture* ph = textures_cache->getTexture( "res/ph.jpg");
+        const sf::Texture* Ph = textures_cache->getTexture( "res/Ph.jpg");
+        const sf::Texture* pH = textures_cache->getTexture( "res/pH.jpg");
+        const sf::Texture* PH = textures_cache->getTexture( "res/PH.jpg");
+
         $M( "Textures: %p, %p, %p, %p\n", ph, Ph, pH, PH);
         assert( ph && Ph && pH && PH);
 

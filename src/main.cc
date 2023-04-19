@@ -90,12 +90,6 @@ main( int argc,
 {
     Options opts = GetClOptions( argc, argv);
 
-    sf::IntRect bounds{ {0, 0}, {100, 100}};
-    gui::TextureFactory::loadTexture( "ph", "res/ph.jpg", bounds);
-    gui::TextureFactory::loadTexture( "pH", "res/pH.jpg", bounds);
-    gui::TextureFactory::loadTexture( "Ph", "res/Ph.jpg", bounds);
-    gui::TextureFactory::loadTexture( "PH", "res/PH.jpg", bounds);
-
     gui::FontFactory::loadFont( "default", "res/font.otf");
 
     $M( "Loaded textures\n");

@@ -19,24 +19,37 @@ template <typename Key, typename Value>
 class LRUCache final
 {
 public:
-    using mapped_type    = Value;
-    using key_type       = Key;
-    using value_type     = std::pair<const key_type, mapped_type>;
-    using list_type      = std::list<value_type>;
-    using map_type       = std::map<const key_type, typename list_type::iterator>;
-    using iterator       = typename list_type::iterator;
-    using const_iterator = typename list_type::const_iterator;
+    using mapped_type      = Value;
+    using key_type         = Key;
+    using value_type       = std::pair<const key_type, mapped_type>;
+    using list_type        = std::list<value_type>;
+    using map_type         = std::map<const key_type, typename list_type::iterator>;
+    using iterator         = typename list_type::iterator;
+    using const_iterator   = typename list_type::const_iterator;
+    using reference        = value_type&;
+    using const_reference  = value_type const&;
 
     iterator            begin()       { return list_.begin(); }
     const_iterator      begin() const { return list_.begin(); }
     iterator              end()       { return list_.end();   }
     const_iterator        end() const { return list_.end();   }
 
+          reference& front()       { return list_.front(); }
+    const_reference& front() const { return list_.front(); }
+          reference&  back()       { return list_.back();  }
+    const_reference&  back() const { return list_.back();  }
+
     LRUCache( size_t capacity)
         : capacity_{ capacity}
     {}
 
     ~LRUCache() = default;
+
+    LRUCache( const LRUCache& other) = delete;
+    LRUCache& operator=( const LRUCache& other) = delete;
+
+    LRUCache( LRUCache&& other) = default;
+    LRUCache& operator=( LRUCache&& other) = default;
 
     size_t size()     const noexcept { return list_.size(); }
     size_t capacity() const noexcept { return capacity_; }

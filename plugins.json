@@ -20,6 +20,11 @@
         }
     },
     {
+        "path" : "./build/textures.so",
+        "name" : "TexturesPlugin",
+        "data" : {}
+    },
+    {
         "path" : "./build/tools.so",
         "name" : "ToolsPlugin",
         "data" : {
