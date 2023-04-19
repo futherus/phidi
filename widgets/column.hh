@@ -130,6 +130,9 @@ Layout( const Column<T>& column,
             case CrossAxisAlignment::Center:
                 pos.x = (col_width - child.getSize().x) / 2;
                 break;
+            default:
+                assert( 0);
+                break;
         }
         pos.x += padding;
 

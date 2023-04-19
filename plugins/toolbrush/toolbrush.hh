@@ -1,7 +1,7 @@
 #pragma once
 
 #include "plugins/tools/tools.hh"
-#include "plugins/tool_pallette/tool_pallette.hh"
+#include "plugins/tool_palette/tool_palette.hh"
 #include "plugins/textures/textures.hh"
 
 namespace xui
@@ -85,9 +85,9 @@ public:
         tool_button2_ = std::make_unique<PushButton>( std::move( pack), sf::Vector2f{ 150, 150});
 
         $D ( "before getting tool_pall plugin\n");
-        auto tl_pal_plg = PluginRegistry::instance()->getPlugin<ToolPallettePlugin>();
+        auto tl_pal_plg = PluginRegistry::instance()->getPlugin<ToolPalettePlugin>();
         $D ( "before getting tool_pall\n");
-        auto tl_pal = tl_pal_plg->getToolPallette();
+        auto tl_pal = tl_pal_plg->getToolPalette();
         $D ( "before adding button\n");
         tl_pal->add( "ToolBrushPlugin::tool1", *tool_button1_);
         tl_pal->add( "ToolBrushPlugin::tool2", *tool_button2_);

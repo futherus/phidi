@@ -215,12 +215,10 @@ public:
 
                 for ( const LayoutObject* obj : objects)
                 {
-                    Geometry g = obj->getGeometry();
+                    // FIXME: Do we need onMouseMoved for widgets that are not under mouse?
                     auto it = mouse_moved_subs_.find( obj->getWidget());
                     if (it != mouse_moved_subs_.end())
-                    {
                         it->second.onMouseMoved( mouse_pos - obj->getPosition());
-                    }
                 }
 
                 break;

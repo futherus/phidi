@@ -7,13 +7,13 @@ add_library( widgets OBJECT )
 target_sources( widgets
     PRIVATE
         button.cc
-        pallette.cc
+        palette.cc
 
     PRIVATE
         column.hh
         button.hh
         widget.hh
-        pallette.hh
+        palette.hh
 )
 
 target_include_directories( widgets PUBLIC ${PROJECT_SOURCE_DIR} )

@@ -1,30 +1,30 @@
-#include "widgets/pallette.hh"
+#include "widgets/palette.hh"
 
 namespace xui
 {
 
 void
-PushPallette::add( BoolControlDelegate&& button)
+PushPalette::add( BoolControlDelegate&& button)
 {
-    size_t sz = column_.size();
+    size_t sz = getColumn().size();
     button.bind( [=]( bool val){ this->onChange( val, sz); });
 
-    column_.push_back( std::move( button));
+    getColumn().push_back( std::move( button));
 }
 
 void
-PushPallette::update( int new_state)
+PushPalette::update( int new_state)
 {
     active_button_ = new_state;
 
-    for ( auto& button : column_ )
+    for ( auto& button : getColumn() )
         button.update( false);
 
-    column_.at( active_button_).update( true);
+    getColumn().at( active_button_).update( true);
 }
 
 void
-PushPallette::onChange( bool is_pressed,
+PushPalette::onChange( bool is_pressed,
                         int button_index)
 {
     if ( is_pressed == false )
@@ -37,7 +37,7 @@ PushPallette::onChange( bool is_pressed,
 }
 
 void
-Render( const PushPallette&,
+Render( const PushPalette&,
         const Geometry& geometry,
         sf::RenderTarget& target)
 {
@@ -49,17 +49,17 @@ Render( const PushPallette&,
 }
 
 LayoutObject
-Layout( const PushPallette& pallette,
+Layout( const PushPalette& palette,
         const Constraints& cons)
 {$FUNC
-    LayoutObject object{ pallette, 1};
+    LayoutObject object{ palette, 1};
 
     $$
-    object.push_back( Layout( pallette.getColumn(), cons));
+    object.push_back( Layout( palette.getPadding(), cons));
 
     object.setSize( object.back().getSize());
 
-    $M( "returning PushPallette (%f, %f) (%f, %f)\n", object.getPosition().x, object.getPosition().y, object.getSize().x, object.getSize().y);
+    $M( "returning PushPalette (%f, %f) (%f, %f)\n", object.getPosition().x, object.getPosition().y, object.getSize().x, object.getSize().y);
     return object;
 }
 

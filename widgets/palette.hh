@@ -5,6 +5,7 @@
 
 #include "widgets/button.hh"
 #include "widgets/column.hh"
+#include "widgets/padding.hh"
 
 namespace xui
 {
@@ -78,20 +79,22 @@ private:
     IsPushedOp* is_pushed_;
 };
 
-class PushPallette final
+class PushPalette final
 {
 public:
-    PushPallette( int padding)
-        : column_{ padding, {MainAxisAlignment::Center, CrossAxisAlignment::Center}}
+    PushPalette( int padding)
+        : column_{ padding, LayoutPolicy{ MainAxisAlignment::Center, CrossAxisAlignment::Center}}
         , on_change_{}
         , active_button_{}
-    {}
+    {
+        column_.setPadding( 15);
+    }
 
-    PushPallette( const PushPallette&) = delete;
-    PushPallette& operator=( const PushPallette&) = delete;
-    PushPallette( PushPallette&&) = delete;
-    PushPallette& operator=( PushPallette&&) = delete;
-    ~PushPallette() = default;
+    PushPalette( const PushPalette&) = delete;
+    PushPalette& operator=( const PushPalette&) = delete;
+    PushPalette( PushPalette&&) = delete;
+    PushPalette& operator=( PushPalette&&) = delete;
+    ~PushPalette() = default;
 
 public:
     void bind( std::function<void( int)>&& func) { on_change_ = std::move( func); }
@@ -101,17 +104,20 @@ public:
     void update( int new_state);
     void onChange( bool new_state, int index);
 
-    const Column<BoolControlDelegate>& getColumn() const { return column_; }
-          Column<BoolControlDelegate>& getColumn()       { return column_; }
+    const Column<BoolControlDelegate>& getColumn() const { return column_.getChild(); }
+          Column<BoolControlDelegate>& getColumn()       { return column_.getChild(); }
+
+    const Padding<Column<BoolControlDelegate>>& getPadding() const { return column_; }
+          Padding<Column<BoolControlDelegate>>& getPadding()       { return column_; }
 
 private:
-    Column<BoolControlDelegate> column_;
+    Padding<Column<BoolControlDelegate>> column_;
     std::function<void( int)> on_change_;
     int active_button_;
 };
 
-void Render( const PushPallette& pallette, const Geometry& geometry, sf::RenderTarget& target);
+void Render( const PushPalette& palette, const Geometry& geometry, sf::RenderTarget& target);
 
-LayoutObject Layout( const PushPallette& pallette, const Constraints& cons);
+LayoutObject Layout( const PushPalette& palette, const Constraints& cons);
 
 } // namespace xui

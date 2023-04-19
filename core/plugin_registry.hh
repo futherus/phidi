@@ -7,7 +7,7 @@
 #include <functional>
 
 #include "debug.hh"
-#include "../include/json/single_include/nlohmann/json.hpp"
+#include "include/json/single_include/nlohmann/json.hpp"
 
 namespace xui
 {

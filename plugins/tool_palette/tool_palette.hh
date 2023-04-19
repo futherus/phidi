@@ -6,12 +6,12 @@
 namespace xui
 {
 
-class ToolPallette final
+class ToolPalette final
 {
 public:
-    ToolPallette()
+    ToolPalette()
         : tool_manager_{}
-        , pallette_{ 5}
+        , palette_{ 5}
     {}
 
     void
@@ -19,7 +19,7 @@ public:
     {
         tool_manager_ = tool_manager;
 
-        pallette_.bind(
+        palette_.bind(
             [&]( int indx){ tool_manager_->setActive( tool_ids_.find( indx)->second); }
         );
 
@@ -30,45 +30,45 @@ public:
 
     void add( std::string tool_id, PushButton& button);
 
-    const PushPallette& getPallette() const { return pallette_; }
-          PushPallette& getPallette()       { return pallette_; }
+    const PushPalette& getPalette() const { return palette_; }
+          PushPalette& getPalette()       { return palette_; }
 
 private:
     ToolManager* tool_manager_;
-    PushPallette pallette_;
+    PushPalette palette_;
 
     std::map<int, std::string> tool_ids_;
 };
 
-class ToolPallettePlugin final
+class ToolPalettePlugin final
     : public IPlugin
 {
 public:
     static const int ID;
 
-    ToolPallettePlugin()
+    ToolPalettePlugin()
         : IPlugin{}
-        , tool_pallette_{ std::make_unique<ToolPallette>()}
+        , tool_palette_{ std::make_unique<ToolPalette>()}
     {$FUNC
-        PluginRegistry::instance()->getPlugin<InitPlugin>()->add( tool_pallette_->getPallette());
-        tool_pallette_->setToolManager( PluginRegistry::instance()->getPlugin<ToolsPlugin>()->getToolManager());
+        PluginRegistry::instance()->getPlugin<InitPlugin>()->add( tool_palette_->getPalette());
+        tool_palette_->setToolManager( PluginRegistry::instance()->getPlugin<ToolsPlugin>()->getToolManager());
     }
 
-    ~ToolPallettePlugin() = default;
+    ~ToolPalettePlugin() = default;
 
     void
     deserialize( const json&) override
     {
         auto tl_mngr_plg = PluginRegistry::instance()->getPlugin<ToolsPlugin>();
-        tool_pallette_->setToolManager( tl_mngr_plg->getToolManager());
+        tool_palette_->setToolManager( tl_mngr_plg->getToolManager());
     }
 
     void serialize( json&) override {}
 
-    ToolPallette* getToolPallette() { return tool_pallette_.get(); }
+    ToolPalette* getToolPalette() { return tool_palette_.get(); }
 
 private:
-    std::unique_ptr<ToolPallette> tool_pallette_;
+    std::unique_ptr<ToolPalette> tool_palette_;
 };
 
 }

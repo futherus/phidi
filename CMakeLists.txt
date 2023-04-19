@@ -76,7 +76,7 @@ add_subdirectory( plugins/init )
 add_subdirectory( plugins/textures )
 add_subdirectory( plugins/tools )
 add_subdirectory( plugins/toolbrush )
-add_subdirectory( plugins/tool_pallette )
+add_subdirectory( plugins/tool_palette )
 
 add_executable( phi main.cc )
 target_include_directories( phi PUBLIC ${PROJECT_SOURCE_DIR} )

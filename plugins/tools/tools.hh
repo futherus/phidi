@@ -5,7 +5,7 @@
 
 #include "core/resources.h"
 #include "core/plugin_registry.hh"
-#include "widgets/pallette.hh"
+#include "widgets/palette.hh"
 #include "plugins/init/init.hh"
 
 namespace xui

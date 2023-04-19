@@ -2,22 +2,7 @@
     {
         "path" : "./build/init.so",
         "name" : "InitPlugin",
-        "data" : {
-            "widget_root" : {
-                "type" : "Column",
-                "policy" : "...",
-                "widgets" : [
-                    {
-                        "type" : "IPlugin",
-                        "name" : "ToolsPlugin"
-                    },
-                    {
-                        "type" : "IPlugin",
-                        "name" : "ToolPallettePlugin"
-                    }
-                ]
-            }
-        }
+        "data" : {}
     },
     {
         "path" : "./build/textures.so",
@@ -32,8 +17,8 @@
         }
     },
     {
-        "path" : "./build/tool_pallette.so",
-        "name" : "ToolPallettePlugin",
+        "path" : "./build/tool_palette.so",
+        "name" : "ToolPalettePlugin",
         "data" : {}
     },
     {
