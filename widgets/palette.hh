@@ -14,7 +14,6 @@ class BoolControlDelegate final
 {
 public:
     using This = void*;
-    using LayoutOp = LayoutObject( This, const Constraints& cons);
     using UpdateOp = void( This, bool);
     using BindOp = void( This, std::function<void( bool)>&&);
     using IsPushedOp = bool( This);
@@ -36,11 +35,6 @@ public:
               std::enable_if_t<!std::is_same<BoolControlDelegate, std::decay_t<BoolControlT>>::value, bool> = true>
     BoolControlDelegate( BoolControlT& control)
         : control_{ std::addressof( control)}
-        , layout_{ []( This ctl, const Constraints& cons)
-                   {$FUNC
-                       auto* tmp = static_cast<const BoolControlT*>( ctl);
-                       return Layout( *tmp, cons);
-                   }}
         , update_{ []( This ctl, bool val)
                    {
                        auto* tmp = static_cast<BoolControlT*>( ctl);
@@ -64,16 +58,9 @@ public:
 
     bool isPushed() const { return is_pushed_( control_); }
 
-    friend LayoutObject
-    Layout( const BoolControlDelegate& control, const Constraints& cons)
-    {$FUNC
-        return control.layout_( control.control_, cons);
-    }
-
 private:
     This control_;
 
-    LayoutOp* layout_;
     UpdateOp* update_;
     BindOp* bind_;
     IsPushedOp* is_pushed_;
@@ -99,19 +86,23 @@ public:
 public:
     void bind( std::function<void( int)>&& func) { on_change_ = std::move( func); }
 
-    void add( BoolControlDelegate&& button);
+    void add( LayoutDelegate&& layout, BoolControlDelegate&& control);
 
     void update( int new_state);
     void onChange( bool new_state, int index);
 
-    const Column<BoolControlDelegate>& getColumn() const { return column_.getChild(); }
-          Column<BoolControlDelegate>& getColumn()       { return column_.getChild(); }
+    // FIXME: private non-const?
+    const Padding<Column<LayoutDelegate>>& getColumn() const { return column_; }
+          Padding<Column<LayoutDelegate>>& getColumn()       { return column_; }
 
-    const Padding<Column<BoolControlDelegate>>& getPadding() const { return column_; }
-          Padding<Column<BoolControlDelegate>>& getPadding()       { return column_; }
+    const std::vector<BoolControlDelegate>& getControls() const { return controls_; }
+          std::vector<BoolControlDelegate>& getControls()       { return controls_; }
+
+    size_t getSize() const { return column_.getChild().size(); }
 
 private:
-    Padding<Column<BoolControlDelegate>> column_;
+    std::vector<BoolControlDelegate> controls_;
+    Padding<Column<LayoutDelegate>> column_;
     std::function<void( int)> on_change_;
     int active_button_;
 };

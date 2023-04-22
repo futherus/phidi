@@ -4,12 +4,15 @@ namespace xui
 {
 
 void
-PushPalette::add( BoolControlDelegate&& button)
+PushPalette::add( LayoutDelegate&& layout,
+                  BoolControlDelegate&& button)
 {
-    size_t sz = getColumn().size();
+    size_t sz = getControls().size();
     button.bind( [=]( bool val){ this->onChange( val, sz); });
 
-    getColumn().push_back( std::move( button));
+    getControls().push_back( std::move( button));
+
+    getColumn().getChild().push_back( std::move( layout));
 }
 
 void
@@ -17,15 +20,15 @@ PushPalette::update( int new_state)
 {
     active_button_ = new_state;
 
-    for ( auto& button : getColumn() )
+    for ( auto& button : getControls() )
         button.update( false);
 
-    getColumn().at( active_button_).update( true);
+    getControls().at( active_button_).update( true);
 }
 
 void
 PushPalette::onChange( bool is_pressed,
-                        int button_index)
+                       int button_index)
 {
     if ( is_pressed == false )
     {
@@ -55,7 +58,7 @@ Layout( const PushPalette& palette,
     LayoutObject object{ palette, 1};
 
     $$
-    object.push_back( Layout( palette.getPadding(), cons));
+    object.push_back( Layout( palette.getColumn(), cons));
 
     object.setSize( object.back().getSize());
 

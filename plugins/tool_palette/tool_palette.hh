@@ -2,6 +2,7 @@
 
 #include "plugins/tools/tools.hh"
 #include "plugins/init/init.hh"
+#include "widgets/padding.hh"
 
 namespace xui
 {
@@ -36,6 +37,8 @@ public:
 private:
     ToolManager* tool_manager_;
     PushPalette palette_;
+
+    std::vector<std::unique_ptr<Padding<PushButton&>>> paddings_;
 
     std::map<int, std::string> tool_ids_;
 };

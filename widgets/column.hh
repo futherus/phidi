@@ -50,6 +50,7 @@ public:
           value_type&    at( size_type i)       { return widgets_.at( i);  }
     const value_type&    at( size_type i) const { return widgets_.at( i);  }
 
+    // FIXME: CamelCase
     void push_back( value_type&& widget) { widgets_.push_back( std::move( widget)); }
 
 public:

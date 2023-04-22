@@ -10,18 +10,27 @@ template <typename T>
 class Padding final
 {
 public:
-    template<typename... ArgsT>
+    /**
+     * Implements:
+     * 1. In-place constructor of Wrapper<AnyBar>
+     * 2. Constructor of Wrapper<NonmovableBar&> from existing NonmovableBar
+     * 3. Constructor of Wrapper<MovableFoo> from existing MovableBar passed as rvalue
+     *
+     * Supports nesting.
+     */
+    template <typename... ArgsT,
+  			  typename = std::enable_if_t<(!std::is_same_v<std::decay<ArgsT>, Padding> && ...)>>
     explicit Padding( ArgsT&&... args)
-        : child_{ std::forward<ArgsT>( args)...}
-        , left_{}
-        , right_{}
-        , top_{}
-        , bottom_{}
+  		: child_{ std::forward<ArgsT>( args)...}
     {}
 
-    explicit Padding( T&& child)
-        : child_{ std::forward( child)}
-    {}
+  	Padding( const Padding& other) = delete;
+  	Padding& operator=( const Padding& other) = delete;
+
+  	Padding( Padding&& other) = delete;
+  	Padding& operator=( Padding&& other) = delete;
+
+    ~Padding() = default;
 
 public:
     void setPadding( float left,
@@ -37,9 +46,9 @@ public:
 
     void setPadding( float val) { setPadding( val, val, val, val); }
 
-    float getLeft() const { return left_; }
-    float getRight() const { return right_; }
-    float getTop() const { return top_; }
+    float getLeft()   const { return left_;   }
+    float getRight()  const { return right_;  }
+    float getTop()    const { return top_;    }
     float getBottom() const { return bottom_; }
 
     const T& getChild() const { return child_; }

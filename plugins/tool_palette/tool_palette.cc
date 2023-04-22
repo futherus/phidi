@@ -22,13 +22,17 @@ ToolPalette::update()
 
 void
 ToolPalette::add( std::string tool_id,
-                   PushButton& button)
+                  PushButton& button)
 {
     // FIXME: button ordering is fixed
     $D( "before inserting index pair\n");
-    tool_ids_.insert( std::pair<int, std::string>{ getPalette().getColumn().size(), std::move( tool_id)});
+    tool_ids_.insert( std::pair<int, std::string>{ getPalette().getSize(), std::move( tool_id)});
 
-    getPalette().add( button);
+    auto pad = std::make_unique<Padding<PushButton&>>( button);
+    pad->setPadding( 5);
+
+    getPalette().add( *pad, button);
+    paddings_.push_back( std::move( pad));
 }
 
 } // namespace xui
