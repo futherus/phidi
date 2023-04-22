@@ -12,7 +12,7 @@ PushPalette::add( LayoutDelegate&& layout,
 
     getControls().push_back( std::move( button));
 
-    getColumn().getChild().push_back( std::move( layout));
+    getColumn().push_back( std::move( layout));
 }
 
 void
@@ -58,9 +58,9 @@ Layout( const PushPalette& palette,
     LayoutObject object{ palette, 1};
 
     $$
-    object.push_back( Layout( palette.getColumn(), cons));
-
-    object.setSize( object.back().getSize());
+    LayoutObject col = Layout( palette.getLayout(), cons);
+    object.setSize( col.getSize());
+    object.push_back( std::move( col));
 
     $M( "returning PushPalette (%f, %f) (%f, %f)\n", object.getPosition().x, object.getPosition().y, object.getSize().x, object.getSize().y);
     return object;

@@ -11,7 +11,7 @@ namespace xui
 class LayoutDelegate final
 {
 public:
-    using This = void*;
+    using This = const void*;
     using LayoutOperation = LayoutObject( This, const Constraints& cons);
 
 public:
@@ -33,7 +33,7 @@ public:
         : widget_{ std::addressof( widget) }
         , layout_{ []( This widget_bytes, const Constraints& cons)
                    {$FUNC
-                       auto* tmp = static_cast<LayoutableT*>( widget_bytes);
+                       auto* tmp = static_cast<const LayoutableT*>( widget_bytes);
                        return Layout( *tmp, cons);
                    }}
     {}

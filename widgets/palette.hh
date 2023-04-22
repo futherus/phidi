@@ -70,11 +70,11 @@ class PushPalette final
 {
 public:
     PushPalette( int padding)
-        : column_{ padding, LayoutPolicy{ MainAxisAlignment::Center, CrossAxisAlignment::Center}}
+        : layout_{ padding, LayoutPolicy{ MainAxisAlignment::Center, CrossAxisAlignment::Center}}
         , on_change_{}
         , active_button_{}
     {
-        column_.setPadding( 15);
+        layout_.setPadding( 15);
     }
 
     PushPalette( const PushPalette&) = delete;
@@ -91,18 +91,21 @@ public:
     void update( int new_state);
     void onChange( bool new_state, int index);
 
-    // FIXME: private non-const?
-    const Padding<Column<LayoutDelegate>>& getColumn() const { return column_; }
-          Padding<Column<LayoutDelegate>>& getColumn()       { return column_; }
+    LayoutDelegate getLayout() const { return LayoutDelegate{ layout_}; }
+
+    size_t getSize() const { assert( getControls().size() == getColumn().size()); return getControls().size(); }
+
+private:
+    const Column<LayoutDelegate>& getColumn() const { return layout_.getChild(); }
+          Column<LayoutDelegate>& getColumn()       { return layout_.getChild(); }
 
     const std::vector<BoolControlDelegate>& getControls() const { return controls_; }
           std::vector<BoolControlDelegate>& getControls()       { return controls_; }
 
-    size_t getSize() const { return column_.getChild().size(); }
-
 private:
     std::vector<BoolControlDelegate> controls_;
-    Padding<Column<LayoutDelegate>> column_;
+    Padding<Column<LayoutDelegate>> layout_;
+
     std::function<void( int)> on_change_;
     int active_button_;
 };

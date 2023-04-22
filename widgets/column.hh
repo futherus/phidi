@@ -50,11 +50,10 @@ public:
           value_type&    at( size_type i)       { return widgets_.at( i);  }
     const value_type&    at( size_type i) const { return widgets_.at( i);  }
 
-    // FIXME: CamelCase
     void push_back( value_type&& widget) { widgets_.push_back( std::move( widget)); }
 
 public:
-    Column( int padding,
+    Column( float padding,
             LayoutPolicy layout_policy)
         : padding_{ padding}
         , layout_policy_{ layout_policy}
@@ -68,11 +67,11 @@ public:
     ~Column() = default;
 
 public:
-    int getPadding() const { return padding_; }
+    float getPadding() const { return padding_; }
     LayoutPolicy getLayoutPolicy() const { return layout_policy_; }
 
 private:
-    int padding_;
+    float padding_;
     LayoutPolicy layout_policy_;
     container widgets_;
 };
