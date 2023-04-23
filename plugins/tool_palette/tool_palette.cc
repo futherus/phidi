@@ -28,11 +28,14 @@ ToolPalette::add( std::string tool_id,
     $D( "before inserting index pair\n");
     tool_ids_.insert( std::pair<int, std::string>{ getPalette().getSize(), std::move( tool_id)});
 
-    auto box = std::make_unique<Padding<SizedBox<PushButton&>>>( button);
+    auto box = std::make_unique<Padding<PushButton&>>( button);
     box->setPadding( 10);
-    box->getChild().setSize( 160, 100);
+    // box->getChild().setSize( 160, 100);
+    static float flex = 1.0f;
 
-    getPalette().add( *box, button);
+    getPalette().add( *box, flex, button);
+    flex += 2;
+
     sized_boxes_.push_back( std::move( box));
 }
 

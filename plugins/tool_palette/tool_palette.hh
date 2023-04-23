@@ -38,7 +38,7 @@ private:
     ToolManager* tool_manager_;
     PushPalette palette_;
 
-    std::vector<std::unique_ptr<Padding<SizedBox<PushButton&>>>> sized_boxes_;
+    std::vector<std::unique_ptr<Padding<PushButton&>>> sized_boxes_;
 
     std::map<int, std::string> tool_ids_;
 };
@@ -53,7 +53,7 @@ public:
         : IPlugin{}
         , tool_palette_{ std::make_unique<ToolPalette>()}
     {$FUNC
-        PluginRegistry::instance()->getPlugin<InitPlugin>()->add( tool_palette_->getPalette());
+        PluginRegistry::instance()->getPlugin<InitPlugin>()->add( tool_palette_->getPalette(), 1.0);
         tool_palette_->setToolManager( PluginRegistry::instance()->getPlugin<ToolsPlugin>()->getToolManager());
     }
 

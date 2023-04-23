@@ -30,7 +30,7 @@ template<typename T>
 class Column final
 {
 public:
-    using value_type = T;
+    using value_type = std::pair<T, float>;
     using size_type = size_t;
     using container = std::vector<value_type>;
     using iterator = typename container::iterator;
@@ -50,7 +50,13 @@ public:
           value_type&    at( size_type i)       { return widgets_.at( i);  }
     const value_type&    at( size_type i) const { return widgets_.at( i);  }
 
-    void push_back( value_type&& widget) { widgets_.push_back( std::move( widget)); }
+    void
+    push_back( T&& widget,
+               float flex)
+    {
+        assert( flex >= 0.0f);
+        widgets_.push_back( {std::move( widget), flex});
+    }
 
 public:
     Column( float padding,
@@ -83,41 +89,57 @@ Render( const Column<T>&,
         sf::RenderTarget&)
 {}
 
+// FIXME: MainAxisAlignment is not used.
 template<typename T>
 inline LayoutObject
 Layout( const Column<T>& column,
         const Constraints& cons)
 {$FUNC
-    size_t n_widgets = column.size();
-    LayoutObject object{ column, n_widgets};
-
-    const float padding = column.getPadding();
-
-    float curr = 0;
-    float vspace = cons.height() - n_widgets * padding;
-    float xspace = cons.width() - 2 * padding;
+    float total_flex = 0;
+    float vspace = cons.height();
     float col_width = 100;
+    std::vector<LayoutObject> fixed;
 
-    for ( const T& widget : column )
+    for ( auto& pair : column)
     {
-        LayoutObject child = Layout( widget, Constraints{ xspace, vspace});
+        if ( pair.second == 0 )
+        {
+            LayoutObject child = Layout( pair.first, Constraints{ cons.width(), vspace});
+            col_width = std::max( col_width, child.getSize().x);
+            vspace -= child.getSize().y;
 
-        child.setPosition({ 0, curr});
-
-        vspace -= child.getSize().y;
-        curr   += child.getSize().y;
-
-        col_width = std::max( col_width, child.getSize().x);
-
-        object.push_back( std::move( child));
+            fixed.push_back( std::move( child));
+        } else
+        {
+            total_flex += pair.second;
+        }
     }
 
-    const float step = (vspace + n_widgets * padding) / (object.size() + 1);
-    int i = 1;
+    float flex_weight = (total_flex > 0) ? vspace / total_flex : 0;
+    LayoutObject self{ column, column.size()};
+    size_t fixed_indx = 0;
 
-    for ( auto& child : object )
+    for ( auto& pair : column)
     {
-        sf::Vector2f pos = child.getPosition();
+        if ( pair.second == 0 )
+        {
+            self.push_back( std::move( fixed.at( fixed_indx)));
+            fixed_indx++;
+        } else
+        {
+            LayoutObject child = Layout( pair.first, Constraints{ cons.width(), pair.second * flex_weight});
+            assert( child.getSize().y == pair.second * flex_weight && "Child must occupy all provided height");
+            col_width = std::max( col_width, child.getSize().x);
+
+            self.push_back( std::move( child));
+        }
+    }
+
+    float curr = 0;
+
+    for ( auto& child : self )
+    {
+        sf::Vector2f pos;
 
         switch ( column.getLayoutPolicy().cross_align_)
         {
@@ -134,18 +156,16 @@ Layout( const Column<T>& column,
                 assert( 0);
                 break;
         }
-        pos.x += padding;
-
-        pos.y += step * i;
-        i++;
+        pos.y = curr;
+        curr += child.getSize().y;
 
         child.setPosition( pos);
     }
-    col_width += 2 * padding;
 
-    object.setSize( sf::Vector2f{ col_width, cons.height()});
-    $M( "Returning Column<T> (%f, %f) (%f, %f)\n", object.getPosition().x, object.getPosition().y, object.getSize().x, object.getSize().y);
-    return object;
+    self.setSize( {col_width, cons.height()});
+    $M( "Returning Column<T> (%f, %f) (%f, %f)\n", self.getPosition().x, self.getPosition().y, self.getSize().x, self.getSize().y);
+
+    return self;
 }
 
 } // namespace xui

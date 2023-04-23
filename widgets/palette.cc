@@ -5,6 +5,7 @@ namespace xui
 
 void
 PushPalette::add( LayoutDelegate&& layout,
+                  float flex,
                   BoolControlDelegate&& button)
 {
     size_t sz = getControls().size();
@@ -12,7 +13,7 @@ PushPalette::add( LayoutDelegate&& layout,
 
     getControls().push_back( std::move( button));
 
-    getColumn().push_back( std::move( layout));
+    getColumn().push_back( std::move( layout), flex);
 }
 
 void

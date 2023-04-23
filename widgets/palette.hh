@@ -86,7 +86,7 @@ public:
 public:
     void bind( std::function<void( int)>&& func) { on_change_ = std::move( func); }
 
-    void add( LayoutDelegate&& layout, BoolControlDelegate&& control);
+    void add( LayoutDelegate&& layout, float flex, BoolControlDelegate&& control);
 
     void update( int new_state);
     void onChange( bool new_state, int index);

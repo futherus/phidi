@@ -170,7 +170,7 @@ public:
         , tool_manager_{ std::make_unique<ToolManager>()}
         , canvas_{ std::make_unique<Canvas>()}
     {$FUNC
-        PluginRegistry::instance()->getPlugin<InitPlugin>()->add( getCanvas());
+        PluginRegistry::instance()->getPlugin<InitPlugin>()->add( getCanvas(), 0.0f);
 
         $D( "Canvas size: (%f, %f)\n", getCanvas().getSize().x, getCanvas().getSize().y);
     }

@@ -28,7 +28,12 @@ public:
 
     void serialize( json&) override {}
 
-    void add( LayoutDelegate&& widget) { manager_.getChild().push_back( std::move( widget)); }
+    void
+    add( LayoutDelegate&& widget,
+         float flex)
+    {
+        manager_.getChild().push_back( std::move( widget), flex);
+    }
 
 private:
     Padding<Column<LayoutDelegate>> manager_;
