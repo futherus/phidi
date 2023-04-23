@@ -28,11 +28,12 @@ ToolPalette::add( std::string tool_id,
     $D( "before inserting index pair\n");
     tool_ids_.insert( std::pair<int, std::string>{ getPalette().getSize(), std::move( tool_id)});
 
-    auto pad = std::make_unique<Padding<PushButton&>>( button);
-    pad->setPadding( 5);
+    auto box = std::make_unique<Padding<SizedBox<PushButton&>>>( button);
+    box->setPadding( 10);
+    box->getChild().setSize( 160, 100);
 
-    getPalette().add( *pad, button);
-    paddings_.push_back( std::move( pad));
+    getPalette().add( *box, button);
+    sized_boxes_.push_back( std::move( box));
 }
 
 } // namespace xui

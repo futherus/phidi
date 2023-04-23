@@ -2,7 +2,7 @@
 
 #include "plugins/tools/tools.hh"
 #include "plugins/init/init.hh"
-#include "widgets/padding.hh"
+#include "widgets/sized_box.hh"
 
 namespace xui
 {
@@ -38,7 +38,7 @@ private:
     ToolManager* tool_manager_;
     PushPalette palette_;
 
-    std::vector<std::unique_ptr<Padding<PushButton&>>> paddings_;
+    std::vector<std::unique_ptr<Padding<SizedBox<PushButton&>>>> sized_boxes_;
 
     std::map<int, std::string> tool_ids_;
 };

@@ -16,17 +16,15 @@ public:
     using TexturePack = std::array<std::array<const sf::Texture*, 2>, 2>;
 
 public:
-    PushButton( TexturePack textures, sf::Vector2f size)
+    PushButton( TexturePack textures)
         : textures_{ std::move( textures)}
         , on_click_{}
-        , size_{ size}
         , is_pushed_{}
         , is_hovered_{}
     {
         assert( textures_[0][0] && textures_[0][1] && textures_[1][0] && textures_[1][1]);
 
         EventManager::instance().subOnMousePressed( *this);
-        $M( "Button size: (%f, %f)\n", size.x, size.y);
     }
 
     PushButton( const PushButton&) = delete;
@@ -43,14 +41,11 @@ public:
 
     bool isPushed() const { return is_pushed_; }
     bool isHovered() const { return is_hovered_; }
-    sf::Vector2f getSize() const { return size_; }
     const TexturePack& getTextures() const { return textures_; }
 
 private:
     TexturePack textures_;
     std::function<void( bool)> on_click_;
-
-    sf::Vector2f size_;
 
     bool is_pushed_;
     bool is_hovered_;

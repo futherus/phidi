@@ -81,8 +81,8 @@ public:
             std::array<const sf::Texture*, 2>{ pH, PH}
         };
 
-        tool_button1_ = std::make_unique<PushButton>( pack, sf::Vector2f{ 100, 100});
-        tool_button2_ = std::make_unique<PushButton>( std::move( pack), sf::Vector2f{ 150, 150});
+        tool_button1_ = std::make_unique<PushButton>( pack); //, sf::Vector2f{ 100, 100});
+        tool_button2_ = std::make_unique<PushButton>( std::move( pack)); //, sf::Vector2f{ 150, 150});
 
         $D ( "before getting tool_pall plugin\n");
         auto tl_pal_plg = PluginRegistry::instance()->getPlugin<ToolPalettePlugin>();

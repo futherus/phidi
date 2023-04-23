@@ -36,10 +36,8 @@ LayoutObject
 Layout( const PushButton& button,
         const Constraints& cons)
 {$FUNC
-    assert( cons >= button.getSize());
-
     // $M( "Layout: Pointer to button: %p\n", button.address());
-    LayoutObject object = LayoutObject{ button, {{}, button.getSize()}};
+    LayoutObject object = LayoutObject{ button, Geometry{ {}, cons}};
     $M( "returning PushButton (%f, %f) (%f, %f)\n", object.getPosition().x, object.getPosition().y, object.getSize().x, object.getSize().y);
     return object;
 }
