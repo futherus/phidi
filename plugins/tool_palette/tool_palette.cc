@@ -31,10 +31,8 @@ ToolPalette::add( std::string tool_id,
     auto box = std::make_unique<Padding<PushButton&>>( button);
     box->setPadding( 10);
     // box->getChild().setSize( 160, 100);
-    static float flex = 1.0f;
 
-    getPalette().add( *box, flex, button);
-    flex += 2;
+    getPalette().add( *box, 1.0f, button);
 
     sized_boxes_.push_back( std::move( box));
 }

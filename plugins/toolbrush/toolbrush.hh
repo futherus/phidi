@@ -3,6 +3,7 @@
 #include "plugins/tools/tools.hh"
 #include "plugins/tool_palette/tool_palette.hh"
 #include "plugins/textures/textures.hh"
+#include "widgets/placeholder.hh"
 
 namespace xui
 {
@@ -48,6 +49,7 @@ public:
         , tool2_{ std::make_unique<ToolBrush>( "ToolBrushPlugin::tool2")}
         , tool_button1_{}
         , tool_button2_{}
+        , placeholder1_{}
     {}
 
     void
@@ -92,6 +94,9 @@ public:
         tl_pal->add( "ToolBrushPlugin::tool1", *tool_button1_);
         tl_pal->add( "ToolBrushPlugin::tool2", *tool_button2_);
         $D ( "after adding button\n");
+
+        auto init_plg = PluginRegistry::instance()->getPlugin<InitPlugin>();
+        init_plg->add( placeholder1_, 0.5f);
     }
 
     void
@@ -106,6 +111,7 @@ private:
     std::unique_ptr<ToolBrush> tool2_;
     std::unique_ptr<PushButton> tool_button1_;
     std::unique_ptr<PushButton> tool_button2_;
+    Placeholder placeholder1_;
 };
 
 } // namespace xui
