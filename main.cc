@@ -111,10 +111,12 @@ main( int argc,
     auto* loader = xui::DynamicLoader::instance();
     auto* reg = xui::PluginRegistry::instance();
     for ( auto& plugin : plugins )
-    {
         loader->load( plugin["path"], plugin["name"]);
-        reg->getPlugin( plugin["name"])->deserialize( plugin["data"]);
-    }
+
+    $M( "Before deserializing plugins\n");
+
+    for ( auto it = plugins.rbegin(); it != plugins.crend(); it++ )
+        reg->getPlugin( (*it)["name"])->deserialize( (*it)["data"]);
 
     $M( "All plugins loaded\n");
 

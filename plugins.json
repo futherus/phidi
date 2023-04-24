@@ -13,7 +13,7 @@
         "path" : "./build/tools.so",
         "name" : "ToolsPlugin",
         "data" : {
-            "active_tool" : "ToolBrushPlugin::tool"
+            "active_tool" : "ToolBrushPlugin::tool1"
         }
     },
     {

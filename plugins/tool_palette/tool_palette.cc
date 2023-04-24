@@ -10,14 +10,17 @@ void
 ToolPalette::update()
 {
     std::string active = tool_manager_->getActive();
-    for ( auto& p : tool_ids_ )
+
+    for ( const auto& id_pair : tool_ids_ )
     {
-        if ( p.second == active )
+        if ( id_pair.second == active )
         {
-            getPalette().update( p.first);
+            getPalette().update( id_pair.first);
             return;
         }
     }
+
+    assert( 0 && "No entry in ToolPalette for such tool");
 }
 
 void
@@ -26,13 +29,12 @@ ToolPalette::add( std::string tool_id,
 {
     // FIXME: button ordering is fixed
     $D( "before inserting index pair\n");
-    tool_ids_.insert( std::pair<int, std::string>{ getPalette().getSize(), std::move( tool_id)});
 
     auto box = std::make_unique<Padding<PushButton&>>( button);
     box->setPadding( 10);
-    // box->getChild().setSize( 160, 100);
 
-    getPalette().add( *box, 1.0f, button);
+    int index = getPalette().add( *box, 1.0f, button);
+    tool_ids_.insert( {index, std::move( tool_id)});
 
     sized_boxes_.push_back( std::move( box));
 }

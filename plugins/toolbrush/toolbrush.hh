@@ -1,8 +1,9 @@
 #pragma once
 
+#include "plugins/textures/textures.hh"
 #include "plugins/tools/tools.hh"
 #include "plugins/tool_palette/tool_palette.hh"
-#include "plugins/textures/textures.hh"
+#include "plugins/property_palette/property_palette.hh"
 #include "widgets/placeholder.hh"
 
 namespace xui
@@ -12,8 +13,8 @@ class ToolBrush final
     : public ITool
 {
 public:
-    ToolBrush( std::string id)
-        : ITool{ id}
+    ToolBrush()
+        : ITool{}
         , width_{}
         , color_{}
         , is_pressed_{ false}
@@ -45,8 +46,8 @@ public:
 
     ToolBrushPlugin()
         : IPlugin{}
-        , tool1_{ std::make_unique<ToolBrush>( "ToolBrushPlugin::tool1")}
-        , tool2_{ std::make_unique<ToolBrush>( "ToolBrushPlugin::tool2")}
+        , tool1_{ std::make_unique<ToolBrush>()}
+        , tool2_{ std::make_unique<ToolBrush>()}
         , tool_button1_{}
         , tool_button2_{}
         , placeholder1_{ sf::Color::Cyan}
@@ -64,8 +65,8 @@ public:
         $D( "before adding tool\n");
         auto tl_mngr_plg = PluginRegistry::instance()->getPlugin<ToolsPlugin>();
         auto tl_mngr = tl_mngr_plg->getToolManager();
-        tl_mngr->addTool( tool1_.get());
-        tl_mngr->addTool( tool2_.get());
+        tl_mngr->addTool( "ToolBrushPlugin::tool1", tool1_.get());
+        tl_mngr->addTool( "ToolBrushPlugin::tool2", tool2_.get());
 
         $D( "before creating button\n");
 
@@ -84,7 +85,7 @@ public:
         };
 
         tool_button1_ = std::make_unique<PushButton>( pack); //, sf::Vector2f{ 100, 100});
-        tool_button2_ = std::make_unique<PushButton>( std::move( pack)); //, sf::Vector2f{ 150, 150});
+        tool_button2_ = std::make_unique<PushButton>( pack); //, sf::Vector2f{ 150, 150});
 
         $D ( "before getting tool_pall plugin\n");
         auto tl_pal_plg = PluginRegistry::instance()->getPlugin<ToolPalettePlugin>();
@@ -97,6 +98,17 @@ public:
 
         auto init_plg = PluginRegistry::instance()->getPlugin<InitPlugin>();
         init_plg->add( placeholder1_, 1, 0.5f);
+
+        // PluginRegistry::instance()->getPlugin<ToolsPlugin>()->getToolManager()->setActive( "ToolBrushPlugin::tool1");
+        // prop_button1_ = std::make_unique<PushButton>( pack);
+        // prop_button1_->bind( [=]( bool val)
+        //                      {
+        //                          tool1_->setColor( val ? sf::Color::Green : sf::Color::Magenta);
+        //                          prop_button1_->update( val);
+        //                      });
+
+        // auto prop_pal_plg = PluginRegistry::instance()->getPlugin<PropertyPalettePlugin>();
+        // prop_pal_plg->getPalette()->add( "ToolBrushPlugin::tool1", *prop_button1_, 1.0);
     }
 
     void
@@ -111,6 +123,8 @@ private:
     std::unique_ptr<ToolBrush> tool2_;
     std::unique_ptr<PushButton> tool_button1_;
     std::unique_ptr<PushButton> tool_button2_;
+    std::unique_ptr<PushButton> prop_button1_;
+
     Placeholder placeholder1_;
 };
 

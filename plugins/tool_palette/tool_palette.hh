@@ -10,16 +10,11 @@ namespace xui
 class ToolPalette final
 {
 public:
-    ToolPalette()
-        : tool_manager_{}
-        , palette_{ 5}
-    {}
-
-    void
-    setToolManager( ToolManager* tool_manager)
+    ToolPalette( ToolManager* tool_manager,
+                 float padding)
+        : tool_manager_{ tool_manager}
+        , palette_{ padding}
     {
-        tool_manager_ = tool_manager;
-
         palette_.bind(
             [&]( int indx){ tool_manager_->setActive( tool_ids_.find( indx)->second); }
         );
@@ -27,10 +22,18 @@ public:
         tool_manager->addView( *this);
     }
 
+    ToolPalette( const ToolPalette&) = delete;
+    ToolPalette& operator=( const ToolPalette&) = delete;
+    ToolPalette( ToolPalette&&) = delete;
+    ToolPalette& operator=( ToolPalette&&) = delete;
+    ~ToolPalette() = default;
+
+public:
     void update();
 
     void add( std::string tool_id, PushButton& button);
 
+public:
     const PushPalette& getPalette() const { return palette_; }
           PushPalette& getPalette()       { return palette_; }
 
@@ -40,6 +43,7 @@ private:
 
     std::vector<std::unique_ptr<Padding<PushButton&>>> sized_boxes_;
 
+    // FIXME: BiMap.
     std::map<int, std::string> tool_ids_;
 };
 
@@ -51,23 +55,30 @@ public:
 
     ToolPalettePlugin()
         : IPlugin{}
-        , tool_palette_{ std::make_unique<ToolPalette>()}
+        , tool_palette_{ std::make_unique<ToolPalette>(
+              PluginRegistry::instance()->getPlugin<ToolsPlugin>()->getToolManager(),
+              10
+          )}
     {$FUNC
-        PluginRegistry::instance()->getPlugin<InitPlugin>()->add( tool_palette_->getPalette(), 0, 1.0);
-        tool_palette_->setToolManager( PluginRegistry::instance()->getPlugin<ToolsPlugin>()->getToolManager());
+        // PluginRegistry::instance()->getPlugin<InitPlugin>()->add( tool_palette_->getPalette(), 0, 1.0);
     }
 
-    ~ToolPalettePlugin() = default;
+    ToolPalettePlugin( const ToolPalettePlugin&) = delete;
+    ToolPalettePlugin& operator=( const ToolPalettePlugin&) = delete;
+    ToolPalettePlugin( ToolPalettePlugin&&) = delete;
+    ToolPalettePlugin& operator=( ToolPalettePlugin&&) = delete;
+    ~ToolPalettePlugin() override = default;
 
+public:
     void
     deserialize( const json&) override
     {
-        auto tl_mngr_plg = PluginRegistry::instance()->getPlugin<ToolsPlugin>();
-        tool_palette_->setToolManager( tl_mngr_plg->getToolManager());
+        PluginRegistry::instance()->getPlugin<InitPlugin>()->add( tool_palette_->getPalette(), 0, 1.0);
     }
 
     void serialize( json&) override {}
 
+public:
     ToolPalette* getToolPalette() { return tool_palette_.get(); }
 
 private:

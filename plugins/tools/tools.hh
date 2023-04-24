@@ -50,19 +50,18 @@ class Canvas;
 
 class ITool
 {
-private:
-    std::string id_;
-
 protected:
     ~ITool() = default;
 
 public:
-    ITool( std::string id)
-        : id_{ std::move( id)}
-    {}
+    ITool() = default;
 
-    const std::string& getId() { return id_; }
+    ITool( const ITool&) = delete;
+    ITool& operator=( const ITool&) = delete;
+    ITool( ITool&&) = delete;
+    ITool& operator=( ITool&&) = delete;
 
+public:
     virtual void onMousePressed ( Canvas* canvas, sf::Vector2f pos) = 0;
     virtual void onMouseReleased( Canvas* canvas, sf::Vector2f pos) = 0;
     virtual void onMouseMoved   ( Canvas* canvas, sf::Vector2f pos) = 0;
@@ -73,24 +72,46 @@ public:
 
 class ToolManager
 {
-private:
-    std::vector<ITool*> tools_;
-    std::string active_tool_;
+public:
+    ToolManager()
+        : tools_{}
+        , active_tool_{ kNoActive}
+        , views_{}
+    {}
 
-    std::vector<ToolManagerViewDelegate> views_;
+    ToolManager( const ToolManager&) = delete;
+    ToolManager& operator=( const ToolManager&) = delete;
+    ToolManager( ToolManager&&) = delete;
+    ToolManager& operator=( ToolManager&&) = delete;
+    ~ToolManager() = default;
+
+public:
+    void addTool( std::string id, ITool* tool);
+    void addView( ToolManagerViewDelegate&& view);
+
+    ITool* getActiveTool() const;
+
+public:
+    void
+    verify() const
+    {
+        assert( tools_.size() > 0 && "No tools were added");
+        assert( active_tool_ != kNoActive && "Active tool was not set");
+        assert( views_.size() > 0 && "ToolManager has no views");
+    }
+
+    void setActive( std::string id);
+    const std::string& getActive() const;
+
+private:
+    static constexpr char* kNoActive = "No active tool";
 
     void updateViews();
 
-public:
-    ToolManager() = default;
+    std::map<std::string, ITool*> tools_;
+    std::string active_tool_;
 
-    void setActive( const std::string& id);
-    const std::string& getActive() const;
-
-    void addTool( ITool* tool);
-    ITool* getActiveTool() const;
-
-    void addView( ToolManagerViewDelegate&& view);
+    std::vector<ToolManagerViewDelegate> views_;
 };
 
 class Canvas final
@@ -169,17 +190,16 @@ public:
         : IPlugin{}
         , tool_manager_{ std::make_unique<ToolManager>()}
         , canvas_{ std::make_unique<Canvas>()}
-    {$FUNC
-        PluginRegistry::instance()->getPlugin<InitPlugin>()->add( getCanvas(), 0, 0.0f);
-
-        $D( "Canvas size: (%f, %f)\n", getCanvas().getSize().x, getCanvas().getSize().y);
-    }
+    {$FUNC}
 
     ~ToolsPlugin() = default;
 
     void
     deserialize( const json& state) override
     {
+        PluginRegistry::instance()->getPlugin<InitPlugin>()->add( getCanvas(), 0, 0.0f);
+        $D( "Canvas size: (%f, %f)\n", getCanvas().getSize().x, getCanvas().getSize().y);
+
         tool_manager_->setActive( state["active_tool"]);
 
         getCanvas().setToolManager( tool_manager_.get());

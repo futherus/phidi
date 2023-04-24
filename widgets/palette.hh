@@ -69,10 +69,10 @@ private:
 class PushPalette final
 {
 public:
-    PushPalette( int padding)
+    PushPalette( float padding)
         : layout_{ LayoutPolicy{ MainAxisAlignment::Center, CrossAxisAlignment::Center}}
         , on_change_{}
-        , active_button_{}
+        , active_button_{ kDisabled}
     {
         layout_.setPadding( padding);
     }
@@ -86,16 +86,25 @@ public:
 public:
     void bind( std::function<void( int)>&& func) { on_change_ = std::move( func); }
 
-    void add( LayoutDelegate&& layout, float flex, BoolControlDelegate&& control);
+    int add( LayoutDelegate&& layout, float flex, BoolControlDelegate&& control);
 
     void update( int new_state);
     void onChange( bool new_state, int index);
 
     LayoutDelegate getLayout() const { return LayoutDelegate{ layout_}; }
 
-    size_t getSize() const { assert( getControls().size() == getColumn().size()); return getControls().size(); }
+    void
+    verify() const
+    {
+        assert( getControls().size() == getColumn().size() && "Number of controls and number of widgets differ");
+        assert( getControls().size() > 0 && "Number of controls is zero");
+        assert( active_button_ != kDisabled && "Active button wasn't set");
+        assert( on_change_ && "Function wasn't binded");
+    }
 
 private:
+    static constexpr int kDisabled = -1;
+
     const Column<LayoutDelegate>& getColumn() const { return layout_.getChild(); }
           Column<LayoutDelegate>& getColumn()       { return layout_.getChild(); }
 

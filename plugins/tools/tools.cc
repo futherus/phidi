@@ -16,18 +16,20 @@ ToolManager::updateViews()
 }
 
 void
-ToolManager::setActive( const std::string& id)
+ToolManager::setActive( std::string id)
 {
     // FIXME: is available?
-    active_tool_ = id;
+    $M( "New active tool: %s\n", id.data());
+    assert( tools_.find( id) != tools_.end() && "No such tool");
 
-    $M( "Active tool: %s\n", id.data());
+    active_tool_ = std::move( id);
     updateViews();
 }
 
 const std::string&
 ToolManager::getActive() const
 {
+    verify();
     return active_tool_;
 }
 
@@ -35,28 +37,26 @@ void
 ToolManager::addView( ToolManagerViewDelegate&& view)
 {
     views_.push_back( std::move( view));
-    updateViews();
 }
 
 void
-ToolManager::addTool( ITool* tool)
+ToolManager::addTool( std::string id, ITool* tool)
 {
     // FIXME: update views or leave it on them?
-    tools_.push_back( tool);
+    tools_.insert( {std::move( id), tool});
 }
 
 ITool*
 ToolManager::getActiveTool() const
 {
-    // FIXME: Store pointer to active tool instead string.
-    // FIXME: Stub tool to handle case if we have no tools.
+    verify();
+
     $D( "active_tool_ = %s\n", active_tool_.data());
 
-    for ( auto t : tools_ )
-        if ( t->getId() == active_tool_ )
-            return t;
+    auto it = tools_.find( active_tool_);
+    assert( it != tools_.end() && "No such tool");
 
-    assert( 0 && "Tool was not found");
+    return it->second;
 }
 
 // void Canvas::drawCircle( sf::Vector2f pos, float radius, sf::Color color);
