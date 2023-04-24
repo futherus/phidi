@@ -3,7 +3,9 @@
 #include "core/plugin_registry.hh"
 #include "core/root.hh"
 #include "widgets/column.hh"
+#include "widgets/row.hh"
 #include "widgets/padding.hh"
+#include "widgets/placeholder.hh"
 
 namespace xui
 {
@@ -16,10 +18,15 @@ public:
 
     InitPlugin()
         : IPlugin{}
-        , manager_{ 10, LayoutPolicy{ MainAxisAlignment::Center, CrossAxisAlignment::Center}}
+        , row_{ LayoutPolicy{ MainAxisAlignment::Center, CrossAxisAlignment::Center}}
+        , cols_{}
     {
-        manager_.setPadding( 20);
-        gRootWidget->push_back( manager_);
+        cols_.push_back( std::make_unique<Column<LayoutDelegate>>( LayoutPolicy{ MainAxisAlignment::Center, CrossAxisAlignment::Center}));
+        cols_.push_back( std::make_unique<Column<LayoutDelegate>>( LayoutPolicy{ MainAxisAlignment::Center, CrossAxisAlignment::Center}));
+        row_.push_back( *cols_.at( 0), 1.0f);
+        row_.push_back( *cols_.at( 1), 1.0f);
+
+        gRootWidget->push_back( row_);
     }
 
     ~InitPlugin() = default;
@@ -30,13 +37,15 @@ public:
 
     void
     add( LayoutDelegate&& widget,
+         size_t index,
          float flex)
     {
-        manager_.getChild().push_back( std::move( widget), flex);
+        cols_.at( index)->push_back( std::move( widget), flex);
     }
 
 private:
-    Padding<Column<LayoutDelegate>> manager_;
+    Row<LayoutDelegate> row_;
+    std::vector<std::unique_ptr<Column<LayoutDelegate>>> cols_;
 };
 
 }

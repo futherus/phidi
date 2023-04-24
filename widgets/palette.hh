@@ -70,11 +70,11 @@ class PushPalette final
 {
 public:
     PushPalette( int padding)
-        : layout_{ padding, LayoutPolicy{ MainAxisAlignment::Center, CrossAxisAlignment::Center}}
+        : layout_{ LayoutPolicy{ MainAxisAlignment::Center, CrossAxisAlignment::Center}}
         , on_change_{}
         , active_button_{}
     {
-        layout_.setPadding( 15);
+        layout_.setPadding( padding);
     }
 
     PushPalette( const PushPalette&) = delete;

@@ -10,17 +10,25 @@ namespace xui
 class Placeholder
 {
 public:
-    Placeholder() = default;
+    Placeholder( sf::Color color)
+        : color_{ color}
+    {}
 
     Placeholder( const Placeholder&) = delete;
     Placeholder& operator=( const Placeholder&) = delete;
     Placeholder( Placeholder&&) = delete;
     Placeholder& operator=( Placeholder&&) = delete;
     ~Placeholder() = default;
+
+public:
+    sf::Color getColor() const { return color_; }
+
+private:
+    sf::Color color_;
 };
 
 inline void
-Render( const Placeholder&,
+Render( const Placeholder& placeholder,
         const Geometry& geometry,
         sf::RenderTarget& target)
 {
@@ -32,7 +40,7 @@ Render( const Placeholder&,
     sf::RectangleShape rectangle;
     rectangle.setSize( sf::Vector2f{ w, h});
     rectangle.setFillColor( sf::Color::Transparent);
-    rectangle.setOutlineColor( sf::Color::Blue);
+    rectangle.setOutlineColor( placeholder.getColor());
     rectangle.setOutlineThickness( -thickness);
     rectangle.setPosition( geometry.left(), geometry.top());
     target.draw( rectangle);
@@ -40,7 +48,7 @@ Render( const Placeholder&,
     float len = std::sqrt( w * w + h * h);
     sf::RectangleShape line;
     line.setSize( {len - 2 * thickness, thickness});
-    line.setFillColor( sf::Color::Blue);
+    line.setFillColor( placeholder.getColor());
     line.setOrigin( { -thickness, thickness / 2});
 
     float angle = std::atan( h / w) / (2 * M_PI) * 360;

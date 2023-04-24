@@ -53,7 +53,7 @@ public:
         : IPlugin{}
         , tool_palette_{ std::make_unique<ToolPalette>()}
     {$FUNC
-        PluginRegistry::instance()->getPlugin<InitPlugin>()->add( tool_palette_->getPalette(), 1.0);
+        PluginRegistry::instance()->getPlugin<InitPlugin>()->add( tool_palette_->getPalette(), 0, 1.0);
         tool_palette_->setToolManager( PluginRegistry::instance()->getPlugin<ToolsPlugin>()->getToolManager());
     }
 

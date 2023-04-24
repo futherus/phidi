@@ -49,7 +49,7 @@ public:
         , tool2_{ std::make_unique<ToolBrush>( "ToolBrushPlugin::tool2")}
         , tool_button1_{}
         , tool_button2_{}
-        , placeholder1_{}
+        , placeholder1_{ sf::Color::Cyan}
     {}
 
     void
@@ -96,7 +96,7 @@ public:
         $D ( "after adding button\n");
 
         auto init_plg = PluginRegistry::instance()->getPlugin<InitPlugin>();
-        init_plg->add( placeholder1_, 0.5f);
+        init_plg->add( placeholder1_, 1, 0.5f);
     }
 
     void

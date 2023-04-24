@@ -6,6 +6,6 @@ namespace xui
 {
 
 template <typename T>
-using Column = Flex<T, true>;
+using Row = Flex<T, false>;
 
 } // namespace xui
