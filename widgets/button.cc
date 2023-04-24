@@ -20,6 +20,8 @@ Render( const PushButton& button,
         const Geometry& geometry,
         sf::RenderTarget& target)
 {
+    button.verify();
+
     const sf::Texture* texture = button.getTextures().at( button.isHovered()).at( button.isPushed());
     assert( texture);
 
@@ -36,6 +38,8 @@ LayoutObject
 Layout( const PushButton& button,
         const Constraints& cons)
 {$FUNC
+    button.verify();
+
     // $M( "Layout: Pointer to button: %p\n", button.address());
     LayoutObject object = LayoutObject{ button, Geometry{ {}, cons}};
     $M( "returning PushButton (%f, %f) (%f, %f)\n", object.getPosition().x, object.getPosition().y, object.getSize().x, object.getSize().y);

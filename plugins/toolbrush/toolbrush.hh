@@ -99,7 +99,6 @@ public:
         auto init_plg = PluginRegistry::instance()->getPlugin<InitPlugin>();
         init_plg->add( placeholder1_, 1, 0.5f);
 
-        // PluginRegistry::instance()->getPlugin<ToolsPlugin>()->getToolManager()->setActive( "ToolBrushPlugin::tool1");
         // prop_button1_ = std::make_unique<PushButton>( pack);
         // prop_button1_->bind( [=]( bool val)
         //                      {

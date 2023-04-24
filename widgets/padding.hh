@@ -22,6 +22,10 @@ public:
   			  typename = std::enable_if_t<(!std::is_same_v<std::decay<ArgsT>, Padding> && ...)>>
     explicit Padding( ArgsT&&... args)
   		: child_{ std::forward<ArgsT>( args)...}
+        , left_{ kNotInitialized}
+        , right_{ kNotInitialized}
+        , top_{ kNotInitialized}
+        , bottom_{ kNotInitialized}
     {}
 
   	Padding( const Padding& other) = delete;
@@ -46,16 +50,28 @@ public:
 
     void setPadding( float val) { setPadding( val, val, val, val); }
 
-    float getLeft()   const { return left_;   }
-    float getRight()  const { return right_;  }
-    float getTop()    const { return top_;    }
-    float getBottom() const { return bottom_; }
+    float getLeft()   const { verify(); return left_;   }
+    float getRight()  const { verify(); return right_;  }
+    float getTop()    const { verify(); return top_;    }
+    float getBottom() const { verify(); return bottom_; }
 
     const T& getChild() const { return child_; }
           T& getChild()       { return child_; }
 
+    void
+    verify() const
+    {
+        assert( left_ != kNotInitialized
+                && right_ != kNotInitialized
+                && top_ != kNotInitialized
+                && bottom_ != kNotInitialized
+                && "Padding wasn't set");
+    }
+
 private:
     T child_;
+
+    static constexpr float kNotInitialized = -1;
 
     float left_;
     float right_;
@@ -65,16 +81,20 @@ private:
 
 template <typename T>
 inline void
-Render( const Padding<T>&,
+Render( const Padding<T>& padding,
         const Geometry&,
         sf::RenderTarget&)
-{}
+{
+    padding.verify();
+}
 
 template <typename T>
 inline LayoutObject
 Layout( const Padding<T>& padding,
         const Constraints& cons)
 {
+    padding.verify();
+
     const sf::Vector2f diff{ padding.getLeft() + padding.getRight(), padding.getTop() + padding.getBottom()};
 
     LayoutObject child = Layout( padding.getChild(), Constraints{ cons - diff});

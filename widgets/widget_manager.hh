@@ -46,21 +46,32 @@ public:
 public:
     sf::Vector2f getSize() const { return size_; }
 
+    void
+    verify() const
+    {
+        assert( size_.x > 0 && size_.y > 0 && "Size is not positive");
+        assert( widgets_.size() > 0 && "Number of widgets is zero");
+    }
+
 private:
     sf::Vector2f size_;
     container widgets_;
 };
 
 inline void
-Render( const WidgetManager&,
+Render( const WidgetManager& manager,
         const Geometry&,
         sf::RenderTarget&)
-{}
+{
+    manager.verify();
+}
 
 inline LayoutObject
 Layout( const WidgetManager& manager,
         const Constraints& cons)
 {$FUNC
+    manager.verify();
+
     LayoutObject object{ manager, manager.size()};
     object.setSize( cons);
 

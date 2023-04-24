@@ -76,6 +76,12 @@ public:
 public:
     LayoutPolicy getLayoutPolicy() const { return layout_policy_; }
 
+    void
+    verify() const
+    {
+        assert( widgets_.size() > 0 && "Number of widgets is zero");
+    }
+
 private:
     LayoutPolicy layout_policy_;
     container widgets_;
@@ -84,10 +90,12 @@ private:
 template<typename T,
          bool IsVertical>
 inline void
-Render( const Flex<T, IsVertical>&,
+Render( const Flex<T, IsVertical>& flex,
         const Geometry&,
         sf::RenderTarget&)
-{}
+{
+    flex.verify();
+}
 
 // FIXME: MainAxisAlignment is not used.
 template<typename T,
@@ -96,6 +104,8 @@ inline LayoutObject
 Layout( const Flex<T, IsVertical>& flex,
         const Constraints& cons)
 {$FUNC
+    flex.verify();
+
     float total_flex = 0;
     float cross_size = 100;
     float main_space = IsVertical ? cons.height() : cons.width();

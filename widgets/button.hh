@@ -35,13 +35,19 @@ public:
 
 public:
     void bind( std::function<void( bool)>&& on_click) { on_click_ = std::move( on_click); }
-    void onMousePressed( sf::Vector2f /* mouse_pos */) const { on_click_( !is_pushed_); }
-    void onMouseReleased( sf::Vector2f /* mouse_pos */) const {}
-    void update( bool val) { is_pushed_ = val; }
+    void onMousePressed( sf::Vector2f /* mouse_pos */) const { verify(); on_click_( !is_pushed_); }
+    void onMouseReleased( sf::Vector2f /* mouse_pos */) const { verify(); }
+    void update( bool val) { verify(); is_pushed_ = val; }
 
-    bool isPushed() const { return is_pushed_; }
-    bool isHovered() const { return is_hovered_; }
+    bool isPushed() const { verify(); return is_pushed_; }
+    bool isHovered() const { verify(); return is_hovered_; }
     const TexturePack& getTextures() const { return textures_; }
+
+    void
+    verify() const
+    {
+        assert( on_click_ && "Function wasn't binded");
+    }
 
 private:
     TexturePack textures_;
