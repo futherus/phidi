@@ -59,6 +59,23 @@ ToolManager::getActiveTool() const
     return it->second;
 }
 
+void
+Render( const ToolManagerStatus&,
+        const Geometry&, 
+        sf::RenderTarget&)
+{}
+
+LayoutObject
+Layout( const ToolManagerStatus& status,
+        const Constraints& cons)
+{$FUNC
+    LayoutObject child = Layout( status.getText(), cons);
+
+    LayoutObject self{ status, child.getGeometry(), 1};
+    self.push_back( std::move( child));
+    return self;
+}
+
 // void Canvas::drawCircle( sf::Vector2f pos, float radius, sf::Color color);
 // void Canvas::drawLine( sf::Vector2f pos1, sf::Vector2f pos2, float width, sf::Color color);
 

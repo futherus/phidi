@@ -8,6 +8,7 @@ target_sources( widgets
     PRIVATE
         button.cc
         palette.cc
+        text_field.cc
 
     PRIVATE
         column.hh

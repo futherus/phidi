@@ -8,7 +8,6 @@
 #include <stdexcept>
 
 //#include "core/lru_cache.hh"
-#include "core/resources.h"
 #include "core/dynloader.hh"
 #include "core/plugin_registry.hh"
 #include "core/event.hh"
@@ -94,8 +93,6 @@ main( int argc,
       char* argv[])
 {
     Options opts = GetClOptions( argc, argv);
-
-    gui::FontFactory::loadFont( "default", "res/font.otf");
 
     $M( "Loaded textures\n");
 

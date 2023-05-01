@@ -6,7 +6,6 @@ add_library( core OBJECT )
 
 target_sources( core
     PRIVATE
-        resources.cc
 
     PRIVATE
         lru_cache.hh
@@ -14,7 +13,6 @@ target_sources( core
         dynloader.hh
         geometry.hh
         plugin_registry.hh
-        resources.h
         root.hh
         layout_tree.hh
 )

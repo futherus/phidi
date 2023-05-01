@@ -10,6 +10,11 @@
         "data" : {}
     },
     {
+        "path" : "./build/fonts.so",
+        "name" : "FontsPlugin",
+        "data" : {}
+    },
+    {
         "path" : "./build/tools.so",
         "name" : "ToolsPlugin",
         "data" : {

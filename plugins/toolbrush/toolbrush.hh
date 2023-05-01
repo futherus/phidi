@@ -5,6 +5,7 @@
 #include "plugins/tool_palette/tool_palette.hh"
 #include "plugins/property_palette/property_palette.hh"
 #include "widgets/placeholder.hh"
+#include "widgets/text_field.hh"
 
 namespace xui
 {
@@ -51,6 +52,9 @@ public:
         , tool_button1_{}
         , tool_button2_{}
         , placeholder1_{ sf::Color::Cyan}
+        , text_field1_{ 30,
+                        PluginRegistry::instance()->getPlugin<FontsPlugin>()->getFont( "res/font.otf"),
+                        "Hello"}
     {}
 
     void
@@ -96,9 +100,12 @@ public:
         tl_pal->add( "ToolBrushPlugin::tool2", *tool_button2_);
         $D ( "after adding button\n");
 
+        text_field1_.bindOnChanged( [](){ $M( "text_field1_ changed\n"); });
+        text_field1_.bindOnSubmitted( [](){ $M( "text_field1_ submitted\n"); });
+
         auto init_plg = PluginRegistry::instance()->getPlugin<InitPlugin>();
         init_plg->add( placeholder1_, 1, 0.5f);
-
+        init_plg->add( text_field1_, 1, 0.5f);
         // prop_button1_ = std::make_unique<PushButton>( pack);
         // prop_button1_->bind( [=]( bool val)
         //                      {
@@ -125,6 +132,7 @@ private:
     std::unique_ptr<PushButton> prop_button1_;
 
     Placeholder placeholder1_;
+    TextField text_field1_;
 };
 
 } // namespace xui

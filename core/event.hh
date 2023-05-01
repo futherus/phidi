@@ -132,6 +132,113 @@ private:
     OnMouseMovedOp* on_mouse_moved_;
 };
 
+class TextEnteredDelegate final
+{
+public:
+    using This = void*;
+    using OnTextEnteredOp = void ( This, uint32_t utf32);
+    using HasFocusOp = bool ( const This);
+
+public:
+    TextEnteredDelegate( const TextEnteredDelegate& other) = delete;
+    TextEnteredDelegate& operator=( const TextEnteredDelegate& other) = delete;
+
+    TextEnteredDelegate( TextEnteredDelegate&& other) = default;
+    TextEnteredDelegate& operator=( TextEnteredDelegate&& other) = default;
+
+    ~TextEnteredDelegate() = default;
+
+    //
+    // We have to protect from non-const copy constructor because
+    // the instantiated template version with T = TextEnteredDelegate is incorrect.
+    //
+    template<typename T,
+             std::enable_if_t<!std::is_same<TextEnteredDelegate, std::decay_t<T>>::value, bool> = true>
+    TextEnteredDelegate( T& object)
+        : object_{ std::addressof( object)}
+        , on_text_entered_{ []( This object_bytes, uint32_t utf32)
+                            {
+                                auto* tmp = static_cast<T*>( object_bytes);
+                                tmp->onTextEntered( utf32);
+                            }}
+        , has_focus_{ []( const This object_bytes)
+                      {
+                          auto* tmp = static_cast<const T*>( object_bytes);
+                          return tmp->hasFocus();
+                      }}
+    {}
+
+    void
+    onTextEntered( uint32_t utf32) const
+    {
+        on_text_entered_( object_, utf32);
+    }
+
+    bool
+    hasFocus() const
+    {
+        return has_focus_( object_);
+    }
+
+private:
+    This object_;
+    OnTextEnteredOp* on_text_entered_;
+    HasFocusOp* has_focus_;
+};
+
+class KeyPressedDelegate final
+{
+public:
+    using This = void*;
+    using OnKeyPressedOp = void ( This, sf::Keyboard::Key code);
+    using HasFocusOp = bool ( const This);
+
+public:
+    KeyPressedDelegate( const KeyPressedDelegate& other) = delete;
+    KeyPressedDelegate& operator=( const KeyPressedDelegate& other) = delete;
+
+    KeyPressedDelegate( KeyPressedDelegate&& other) = default;
+    KeyPressedDelegate& operator=( KeyPressedDelegate&& other) = default;
+
+    ~KeyPressedDelegate() = default;
+
+    //
+    // We have to protect from non-const copy constructor because
+    // the instantiated template version with T = KeyPressedDelegate is incorrect.
+    //
+    template<typename T,
+             std::enable_if_t<!std::is_same<KeyPressedDelegate, std::decay_t<T>>::value, bool> = true>
+    KeyPressedDelegate( T& object)
+        : object_{ std::addressof( object)}
+        , on_key_pressed_{ []( This object_bytes, sf::Keyboard::Key code)
+                            {
+                                auto* tmp = static_cast<T*>( object_bytes);
+                                tmp->onKeyPressed( code);
+                            }}
+        , has_focus_{ []( const This object_bytes)
+                      {
+                          auto* tmp = static_cast<const T*>( object_bytes);
+                          return tmp->hasFocus();
+                      }}
+    {}
+
+    void
+    onKeyPressed( sf::Keyboard::Key code) const
+    {
+        on_key_pressed_( object_, code);
+    }
+
+    bool
+    hasFocus() const
+    {
+        return has_focus_( object_);
+    }
+
+private:
+    This object_;
+    OnKeyPressedOp* on_key_pressed_;
+    HasFocusOp* has_focus_;
+};
 
 // FIXME: remove sf::Event dependency.
 class EventManager
@@ -163,6 +270,20 @@ public:
     subOnMouseMoved( T& object)
     {
         mouse_moved_subs_.insert( {std::addressof( object), MouseMovedDelegate{ object}});
+    }
+
+    template <typename T>
+    void
+    subOnTextEntered( T& object)
+    {
+        text_entered_subs_.push_back( TextEnteredDelegate{ object});
+    }
+
+    template <typename T>
+    void
+    subOnKeyPressed( T& object)
+    {
+        key_pressed_subs_.push_back( KeyPressedDelegate{ object});
     }
 
     void
@@ -223,6 +344,26 @@ public:
 
                 break;
             }
+            case sf::Event::TextEntered:
+            {
+                for ( const TextEnteredDelegate& delegate : text_entered_subs_)
+                {
+                    if ( delegate.hasFocus())
+                        delegate.onTextEntered( event.text.unicode);
+                }
+
+                break;
+            }
+            case sf::Event::KeyPressed:
+            {
+                for ( const KeyPressedDelegate& delegate : key_pressed_subs_)
+                {
+                    if ( delegate.hasFocus())
+                        delegate.onKeyPressed( event.key.code);
+                }
+
+                break;
+            }
             default:
             {
                 break;
@@ -236,6 +377,9 @@ private:
     std::unordered_map<const void*, MousePressedDelegate>  mouse_pressed_subs_;
     std::unordered_map<const void*, MouseReleasedDelegate> mouse_released_subs_;
     std::unordered_map<const void*, MouseMovedDelegate>    mouse_moved_subs_;
+
+    std::vector<TextEnteredDelegate> text_entered_subs_;
+    std::vector<KeyPressedDelegate>  key_pressed_subs_;
 };
 
 } // namespace xui

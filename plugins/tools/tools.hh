@@ -3,10 +3,11 @@
 #include <cassert>
 #include <SFML/Graphics.hpp>
 
-#include "core/resources.h"
 #include "core/plugin_registry.hh"
 #include "widgets/palette.hh"
+#include "widgets/text.hh"
 #include "plugins/init/init.hh"
+#include "plugins/fonts/fonts.hh"
 
 namespace xui
 {
@@ -104,7 +105,7 @@ public:
     const std::string& getActive() const;
 
 private:
-    static constexpr char* kNoActive = "No active tool";
+    static constexpr const char* kNoActive = "No active tool";
 
     void updateViews();
 
@@ -113,6 +114,38 @@ private:
 
     std::vector<ToolManagerViewDelegate> views_;
 };
+
+class ToolManagerStatus final
+{
+public:
+    ToolManagerStatus( ToolManager* tool_manager)
+        : tool_manager_{ tool_manager}
+        , current_tool_{ 30,
+                         PluginRegistry::instance()->getPlugin<FontsPlugin>()->getFont( "res/font.otf"),
+                         "<Current tool>"}
+    {
+        tool_manager->addView( *this);
+    }
+
+    ToolManagerStatus( const ToolManagerStatus&) = delete;
+    ToolManagerStatus& operator=( const ToolManagerStatus&) = delete;
+    ToolManagerStatus( ToolManagerStatus&&) = delete;
+    ToolManagerStatus& operator=( ToolManagerStatus&&) = delete;
+    ~ToolManagerStatus() = default;
+
+public:
+    void update() { current_tool_.setString( tool_manager_->getActive()); }
+
+    const Text& getText() const { return current_tool_; }
+          Text& getText()       { return current_tool_; }
+
+private:
+    ToolManager* tool_manager_;
+    Text current_tool_;
+};
+
+void Render( const ToolManagerStatus& status, const Geometry& geometry, sf::RenderTarget& target);
+LayoutObject Layout( const ToolManagerStatus& status, const Constraints& cons);
 
 class Canvas final
 {
@@ -190,6 +223,7 @@ public:
         : IPlugin{}
         , tool_manager_{ std::make_unique<ToolManager>()}
         , canvas_{ std::make_unique<Canvas>()}
+        , status_{ tool_manager_.get()}
     {$FUNC}
 
     ~ToolsPlugin() = default;
@@ -197,8 +231,10 @@ public:
     void
     deserialize( const json& state) override
     {
-        PluginRegistry::instance()->getPlugin<InitPlugin>()->add( getCanvas(), 0, 0.0f);
+        auto init_plg = PluginRegistry::instance()->getPlugin<InitPlugin>();
+        init_plg->add( getCanvas(), 0, 0.0f);
         $D( "Canvas size: (%f, %f)\n", getCanvas().getSize().x, getCanvas().getSize().y);
+        init_plg->add( status_, 0, 0.5f);
 
         tool_manager_->setActive( state["active_tool"]);
 
@@ -223,6 +259,8 @@ public:
 private:
     std::unique_ptr<ToolManager> tool_manager_;
     std::unique_ptr<Canvas> canvas_;
+
+    ToolManagerStatus status_;
 };
 
 } // namespace xui
