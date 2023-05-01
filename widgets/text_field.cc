@@ -39,7 +39,7 @@ TextField::onTextEntered( uint32_t utf32)
     }
 }
 
-inline void
+void
 Render( const TextField& text,
         const Geometry& geometry,
         sf::RenderTarget& target)
@@ -60,7 +60,7 @@ Render( const TextField& text,
     target.draw( render_text);
 }
 
-inline LayoutObject
+LayoutObject
 Layout( const TextField& text,
         const Constraints& cons)
 {

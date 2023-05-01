@@ -3,7 +3,6 @@
 #include "plugins/textures/textures.hh"
 #include "plugins/tools/tools.hh"
 #include "plugins/tool_palette/tool_palette.hh"
-#include "plugins/property_palette/property_palette.hh"
 #include "widgets/placeholder.hh"
 #include "widgets/text_field.hh"
 
