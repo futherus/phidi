@@ -8,4 +8,3 @@ target_sources( init
 )
 
 target_include_directories( init PUBLIC ${PROJECT_SOURCE_DIR} )
-target_link_libraries( init sfml-graphics )

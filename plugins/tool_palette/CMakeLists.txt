@@ -8,4 +8,3 @@ target_sources( tool_palette
 )
 
 target_include_directories( tool_palette PUBLIC ${PROJECT_SOURCE_DIR} )
-target_link_libraries( tool_palette sfml-graphics )

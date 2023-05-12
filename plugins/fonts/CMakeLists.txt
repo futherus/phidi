@@ -8,4 +8,3 @@ target_sources( fonts
 )
 
 target_include_directories( fonts PUBLIC ${PROJECT_SOURCE_DIR} )
-target_link_libraries( fonts sfml-graphics )

@@ -9,6 +9,8 @@
 #include "plugins/init/init.hh"
 #include "plugins/fonts/fonts.hh"
 
+#include "3rd-party/json/include/nlohmann/json.hpp"
+
 namespace xui
 {
 

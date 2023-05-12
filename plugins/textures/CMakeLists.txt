@@ -8,4 +8,3 @@ target_sources( textures
 )
 
 target_include_directories( textures PUBLIC ${PROJECT_SOURCE_DIR} )
-target_link_libraries( textures sfml-graphics )

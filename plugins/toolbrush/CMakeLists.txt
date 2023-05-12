@@ -8,4 +8,3 @@ target_sources( toolbrush
 )
 
 target_include_directories( toolbrush PUBLIC ${PROJECT_SOURCE_DIR} )
-target_link_libraries( toolbrush sfml-graphics )

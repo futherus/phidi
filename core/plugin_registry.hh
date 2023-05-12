@@ -6,8 +6,8 @@
 #include <cassert>
 #include <functional>
 
-#include "debug.hh"
-#include "include/json/single_include/nlohmann/json.hpp"
+#include "core/debug.hh"
+#include "3rd-party/json/include/nlohmann/json_fwd.hpp"
 
 namespace xui
 {

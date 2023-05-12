@@ -9,9 +9,9 @@ using Node = Agnode_t*;
 
 enum class ObjectTag
 {
-    Node = AGNODE,
-    Edge = AGEDGE,
-    Graph = AGRAPH,
+    NodeTag = AGNODE,
+    EdgeTag = AGEDGE,
+    GraphTag = AGRAPH,
 };
 
 class Graph

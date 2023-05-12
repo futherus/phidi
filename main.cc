@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <unistd.h>
 #include <iostream>
+
 #include <cmath>
 #include <random>
 #include <fstream>
@@ -11,13 +12,15 @@
 #include "core/dynloader.hh"
 #include "core/plugin_registry.hh"
 #include "core/event.hh"
+#include "core/graphviz.hh"
 //#include "core/root.hh"
 
 //#include "widgets/column.hh"
 #include "widgets/button.hh"
 #include "widgets/widget_manager.hh"
 
-#include "core/graphviz.hh"
+#include "fmt/core.h"
+#include "nlohmann/json.hpp"
 
 xui::WidgetManager* gRootWidget = nullptr;
 

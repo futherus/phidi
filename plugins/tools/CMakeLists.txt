@@ -8,4 +8,3 @@ target_sources( tools
 )
 
 target_include_directories( tools PUBLIC ${PROJECT_SOURCE_DIR} )
-target_link_libraries( tools sfml-graphics )

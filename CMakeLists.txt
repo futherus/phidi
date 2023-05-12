@@ -57,6 +57,18 @@ cmake_print_variables( SFML_LIBRARIES )
 find_package( Graphviz REQUIRED )
 
 # -----------------------------------------------------------------------------
+# Configure nlohmann/json
+# -----------------------------------------------------------------------------
+set( JSON_Install OFF CACHE INTERNAL "" )
+set( JSON_MultipleHeaders ON )
+add_subdirectory( 3rd-party/json )
+
+# -----------------------------------------------------------------------------
+# Configure fmt
+# -----------------------------------------------------------------------------
+add_subdirectory( 3rd-party/fmt )
+
+# -----------------------------------------------------------------------------
 # Remove stupid 'lib' prefix produced by add_library()
 # -----------------------------------------------------------------------------
 set( CMAKE_STATIC_LIBRARY_PREFIX "" )
@@ -81,6 +93,13 @@ set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 #
 # https://cmake.org/cmake/help/latest/command/file.html#glob
 # -----------------------------------------------------------------------------
+
+link_libraries( sfml-graphics
+                cgraph gvc
+                nlohmann_json::nlohmann_json
+                fmt::fmt
+)
+
 add_subdirectory( plugins/init )
 add_subdirectory( plugins/textures )
 add_subdirectory( plugins/fonts )
@@ -88,6 +107,7 @@ add_subdirectory( plugins/tools )
 add_subdirectory( plugins/toolbrush )
 add_subdirectory( plugins/tool_palette )
 # add_subdirectory( plugins/property_palette )
+
 
 add_executable( phi main.cc )
 target_include_directories( phi PUBLIC ${PROJECT_SOURCE_DIR} )
@@ -102,4 +122,6 @@ target_link_libraries( phi
         core
         sfml-graphics
         cgraph gvc
+        nlohmann_json::nlohmann_json
+        fmt::fmt
 )
