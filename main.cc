@@ -17,6 +17,8 @@
 #include "widgets/button.hh"
 #include "widgets/widget_manager.hh"
 
+#include "core/graphviz.hh"
+
 xui::WidgetManager* gRootWidget = nullptr;
 
 struct Options

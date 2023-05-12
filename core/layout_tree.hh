@@ -7,8 +7,9 @@
 #include <array>
 #include <SFML/Graphics.hpp>
 
-#include "geometry.hh"
-#include "debug.hh"
+#include "core/graphviz.hh"
+#include "core/geometry.hh"
+#include "core/debug.hh"
 
 namespace xui
 {

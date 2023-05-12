@@ -40,11 +40,21 @@ set( CMAKE_CXX_STANDARD_REQUIRED ON )
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 # -----------------------------------------------------------------------------
+# Add custom finders folder
+# -----------------------------------------------------------------------------
+set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/" )
+
+# -----------------------------------------------------------------------------
 # Find SFML
 # -----------------------------------------------------------------------------
 find_package( SFML COMPONENTS system window graphics REQUIRED )
 set( SFML_LIBRARIES sfml-system sfml-window sfml-graphics )
 cmake_print_variables( SFML_LIBRARIES )
+
+# -----------------------------------------------------------------------------
+# Find Graphviz
+# -----------------------------------------------------------------------------
+find_package( Graphviz REQUIRED )
 
 # -----------------------------------------------------------------------------
 # Remove stupid 'lib' prefix produced by add_library()
@@ -71,7 +81,6 @@ set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 #
 # https://cmake.org/cmake/help/latest/command/file.html#glob
 # -----------------------------------------------------------------------------
-
 add_subdirectory( plugins/init )
 add_subdirectory( plugins/textures )
 add_subdirectory( plugins/fonts )
@@ -92,4 +101,5 @@ target_link_libraries( phi
     PRIVATE
         core
         sfml-graphics
+        cgraph gvc
 )
