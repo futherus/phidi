@@ -1,0 +1,7 @@
+#!/bin/bash
+
+#
+# Debug program runner
+# Usage: dbg/run.sh
+#
+LSAN_OPTIONS=suppressions=dbg/asan.supp ./build/phi -p plugins.json

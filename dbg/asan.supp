@@ -1,0 +1,6 @@
+# Leak Sanitizer suppressions
+# Usage: LSAN_OPTIONS=suppressions=dbg/asan.supp ./<your_binary>
+# I hate the projects listed below:
+
+leak:libfontconfig
+
