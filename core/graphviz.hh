@@ -2,6 +2,7 @@
 #include <graphviz/gvc.h>
 #include <string>
 
+namespace xui {
 namespace gv {
 
 using Edge = Agedge_t*;
@@ -74,7 +75,7 @@ public:
         return edge;
     }
 
-    void render( FILE* file, const std::string& format)
+    void render( FILE* file, const std::string& format = "png")
     {
         GVC_t* gvc_p = gvContext();
 
@@ -97,4 +98,5 @@ private:
     Agraph_t* graph_p;
 };
 
-};
+} // namespace gv
+} // namespace xui

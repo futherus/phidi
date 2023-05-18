@@ -60,6 +60,7 @@ private:
 
 // void onMouseMoved(   const PushButton&, const sf::Event&);
 
+Json DumpInfo( const PushButton& button);
 void Render( const PushButton& button, const Geometry& geometry, sf::RenderTarget& target);
 LayoutObject Layout( const PushButton& button, const Constraints& cons);
 

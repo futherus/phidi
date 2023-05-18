@@ -6,7 +6,7 @@ add_library( core OBJECT )
 
 target_sources( core
     PRIVATE
-
+        layout_tree.cc
     PRIVATE
         lru_cache.hh
         debug.hh

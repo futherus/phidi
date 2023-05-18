@@ -46,4 +46,12 @@ Layout( const PushButton& button,
     return object;
 }
 
+Json
+DumpInfo( const PushButton& button)
+{
+    Json info = DumpInfo<PushButton>( button);
+    info[".isPushed"] = button.isPushed();
+    return info;
+}
+
 } // namespace xui

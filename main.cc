@@ -135,6 +135,7 @@ main( int argc,
     std::vector<const void*> clicked{};
     clicked.reserve( 0x10);
 
+    bool should_dump = true;
     while ( window.isOpen() )
     {
         sf::Event event = {};
@@ -170,6 +171,16 @@ main( int argc,
 
         window.clear( sf::Color::Black);
         Render( obj, window);
+        if ( should_dump )
+        {
+            FILE *outfp = fopen( "dump/lot.png", "w");
+            obj.showGraph( outfp);
+            fclose( outfp);
+            should_dump = false;
+
+            std::cout << DumpInfo( obj, 1).dump( 4);
+        }
+
         window.display();
     }
 

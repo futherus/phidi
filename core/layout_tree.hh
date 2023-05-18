@@ -7,20 +7,33 @@
 #include <array>
 #include <SFML/Graphics.hpp>
 
-#include "core/graphviz.hh"
-#include "core/geometry.hh"
-#include "core/debug.hh"
+#include "../core/graphviz.hh"
+#include "../core/geometry.hh"
+#include "../core/debug.hh"
+
+#include "nlohmann/json.hpp"
+
+using Json = nlohmann::ordered_json;
 
 namespace xui
 {
 
+template <typename T>
+Json
+DumpInfo( const T& object)
+{
+    Json info{};
+    info["type"] = typeid( T).name();
+    return info;
+}
+
 class LayoutObject final
 {
 public:
-    using container = std::vector<LayoutObject>;
+    using Container = std::vector<LayoutObject>;
 
-    using iterator = container::iterator;
-    using const_iterator = container::const_iterator;
+    using iterator       = Container::iterator;
+    using const_iterator = Container::const_iterator;
 
     iterator            begin()       { return children_.begin(); }
     const_iterator      begin() const { return children_.begin(); }
@@ -37,10 +50,6 @@ public:
     void push_back( LayoutObject&& value) { children_.push_back( std::move( value)); }
 
 public:
-    using This = const void*;
-    using RenderOp = void ( This, sf::RenderTarget&, const Geometry&);
-
-public:
     LayoutObject( const LayoutObject& other) = delete;
     LayoutObject& operator=( const LayoutObject& other) = delete;
 
@@ -49,23 +58,32 @@ public:
 
     ~LayoutObject() = default;
 
+private:
+    using ObjectImpl = const void;
+    using RenderCall = void ( ObjectImpl*, sf::RenderTarget&, const Geometry&);
+    using DumpInfoCall = Json ( ObjectImpl*);
+
+public:
     template <typename T>
     LayoutObject( const T& widget,
                   const Geometry& geometry = {},
                   std::size_t prealloc = 0)
         : geometry_{ geometry}
-        , widget_{ std::addressof( widget)}
         , children_{}
-        , render_{ []( This wgt, sf::RenderTarget& target, const Geometry& geom)
-                   {
-                       //   fprintf( stderr, "[RENDER]: %10s s: (%4f %4f) p: (%4f %4f)\n", typeid( T).name(),
-                       //            geom.size().x, geom.size().y, geom.tl().x, geom.tl().y);
-
-                       auto* tmp = static_cast<const T*>( wgt);
-                       Render( *tmp, geom, target);
-
-                       dbgRenderGeometry( target, geom);
-                   }}
+        , widget_{ std::addressof( widget)}
+        , render_{ []( ObjectImpl* object,
+                       sf::RenderTarget& target,
+                       const Geometry& geometry )
+                    {
+                        auto* tmp = static_cast<const T*>( object);
+                        Render( *tmp, geometry, target);
+                        drawOutline( target, geometry);
+                    }} /* RenderCall */
+        , dump_info_{ []( ObjectImpl* object)
+                      {
+                          $M( "Call dump_info_ Dump!!!\n");
+                          return DumpInfo( *static_cast<const T*>( object));
+                      }} /* DumpInfoCall */
     {
         children_.reserve( prealloc);
     }
@@ -87,7 +105,26 @@ public:
         }
     }
 
-public:
+    friend Json
+    DumpInfo( const LayoutObject& obj,
+              int tree_depth = 0)
+    {
+        Json info = obj.dump_info_( obj.widget_);
+
+        if ( tree_depth )
+        {
+            Json child_info{};
+            for ( const auto& child : obj.children_ )
+            {
+                child_info.emplace_back( DumpInfo( child, tree_depth - 1));
+            }
+
+            info["children"] = std::move( child_info);
+        }
+
+        return info;
+    }
+
     void
     adjust()
     {
@@ -118,6 +155,8 @@ public:
         }
     }
 
+    void showGraph( FILE* file) const;
+
     sf::Vector2f getSize() const { return geometry_.size(); }
     void setSize( const sf::Vector2f& size) { geometry_.setSize( size); }
 
@@ -127,28 +166,33 @@ public:
     Geometry getGeometry() const { return geometry_; }
     void setGeometry( const Geometry& geometry) { geometry_ = geometry; }
 
-    const void* getWidget() const { return widget_; }
+    ObjectImpl* getWidget() const { return widget_; }
 
 private:
     static void
-    dbgRenderGeometry( sf::RenderTarget& target,
-                       const Geometry& geometry)
+    drawOutline( sf::RenderTarget& target,
+                 const Geometry& geometry)
     {
         sf::RectangleShape rectangle;
+
         rectangle.setSize( sf::Vector2f{ geometry.size().x, geometry.size().y});
         rectangle.setFillColor( sf::Color::Transparent);
         rectangle.setOutlineColor( sf::Color::Red);
         rectangle.setOutlineThickness( 1);
         rectangle.setPosition( geometry.tl().x, geometry.tl().y);
+
         target.draw( rectangle);
     }
 
 private:
     Geometry geometry_;
-    This widget_;
-    container children_;
+    Container children_;
+    ObjectImpl* widget_;
 
-    RenderOp* render_;
+    RenderCall* render_;
+    DumpInfoCall* dump_info_;
 };
 
 } // namespace xui
+
+
