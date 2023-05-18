@@ -1,8 +1,23 @@
 #include "../core/layout_tree.hh"
 #include "fmt/core.h"
 #include <regex>
+#include <cxxabi.h>
 
 namespace xui {
+
+std::string
+Demangle( const char* mangled)
+{
+    std::string demangled = mangled;
+    char* name = abi::__cxa_demangle( mangled, nullptr, nullptr, nullptr);
+    if ( name )
+    {
+        demangled = name;
+    }
+
+    free( name);
+    return demangled;
+}
 
 static gv::Node
 DumpRecursive( gv::Graph& graph,
@@ -16,6 +31,8 @@ DumpRecursive( gv::Graph& graph,
     const int kJsonIndent = 2;
     std::string widget_info = fmt::format( "{}", DumpInfo( obj).dump( kJsonIndent, ' ', true));
     widget_info = std::regex_replace( widget_info, std::regex(R"(\n)"), "\\l");
+    widget_info = std::regex_replace( widget_info, std::regex(R"(<)"), "\\<");
+    widget_info = std::regex_replace( widget_info, std::regex(R"(>)"), "\\>");
 
     std::fprintf( stderr, "Widget info: %s\n", widget_info.c_str());
     const std::string label = fmt::format( "{{ Layout Object | address: {} | {} | {} }}",
@@ -55,5 +72,6 @@ LayoutObject::showGraph( FILE* file) const
     graph.dump( stderr);
     graph.render( file);
 }
+
 
 } // namespace xui

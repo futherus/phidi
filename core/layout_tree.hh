@@ -18,12 +18,14 @@ using Json = nlohmann::ordered_json;
 namespace xui
 {
 
+std::string Demangle( const char* mangled);
+
 template <typename T>
 Json
-DumpInfo( const T& object)
+DumpInfo( const T&)
 {
     Json info{};
-    info["type"] = typeid( T).name();
+    info["type"] = Demangle( typeid( T).name());
     return info;
 }
 
