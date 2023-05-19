@@ -57,15 +57,25 @@ cmake_print_variables( SFML_LIBRARIES )
 find_package( Graphviz REQUIRED )
 
 # -----------------------------------------------------------------------------
+# Configure 3rd-party submodules
+#
+# We have to enable -isystem (SystemInclude) flag for each submodule to disable
+# generated warnings.
+# See: https://www.foonathan.net/2018/10/cmake-warnings/
+# -----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
 # Configure nlohmann/json
 # -----------------------------------------------------------------------------
 set( JSON_Install OFF CACHE INTERNAL "" )
 set( JSON_MultipleHeaders ON )
+set( JSON_SystemInclude ON )
 add_subdirectory( 3rd-party/json )
 
 # -----------------------------------------------------------------------------
 # Configure fmt
 # -----------------------------------------------------------------------------
+set( FMT_SYSTEM_HEADERS ON )
 add_subdirectory( 3rd-party/fmt )
 
 # -----------------------------------------------------------------------------
@@ -94,11 +104,15 @@ set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 # https://cmake.org/cmake/help/latest/command/file.html#glob
 # -----------------------------------------------------------------------------
 
-link_libraries( sfml-graphics
-                cgraph gvc
-                nlohmann_json::nlohmann_json
-                fmt::fmt
+link_libraries(
+    sfml-graphics
+    cgraph gvc
+    nlohmann_json::nlohmann_json
+    fmt::fmt
 )
+
+include_directories( SYSTEM PRIVATE /usr/include/c++/ )
+
 
 add_subdirectory( plugins/init )
 add_subdirectory( plugins/textures )

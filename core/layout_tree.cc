@@ -1,22 +1,70 @@
-#include "../core/layout_tree.hh"
-#include "fmt/core.h"
-#include <regex>
 #include <cxxabi.h>
+#include "fmt/core.h"
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+/* I hate it this bullshit... */
+#include <regex>
+#pragma GCC diagnostic pop
+
+#include "../core/layout_tree.hh"
 
 namespace xui {
 
-std::string
-Demangle( const char* mangled)
+void
+Render( const LayoutObject& obj,
+        sf::RenderTarget& target)
 {
-    std::string demangled = mangled;
-    char* name = abi::__cxa_demangle( mangled, nullptr, nullptr, nullptr);
-    if ( name )
+    obj.render_( obj.widget_, target, obj.geometry_);
+    for ( auto& child : obj.children_ )
     {
-        demangled = name;
+        Render( child, target);
+    }
+}
+
+Json
+DumpInfo( const LayoutObject& obj,
+          int tree_depth = 0)
+{
+    Json info = obj.dump_info_( obj.widget_);
+
+    if ( tree_depth )
+    {
+        Json child_info{};
+        for ( const auto& child : obj.children_ )
+        {
+            child_info.emplace_back( DumpInfo( child, tree_depth - 1));
+        }
+
+        info["children"] = std::move( child_info);
     }
 
-    free( name);
-    return demangled;
+    return info;
+}
+
+void
+LayoutObject::adjust()
+{
+    for ( auto& child : children_ )
+    {
+        child.geometry_.translate( geometry_.tl());
+        child.adjust();
+    }
+}
+
+void
+LayoutObject::drawOutline( sf::RenderTarget& target,
+             const Geometry& geometry)
+{
+    sf::RectangleShape rectangle;
+
+    rectangle.setSize( sf::Vector2f{ geometry.size().x, geometry.size().y});
+    rectangle.setFillColor( sf::Color::Transparent);
+    rectangle.setOutlineColor( sf::Color::Red);
+    rectangle.setOutlineThickness( 1);
+    rectangle.setPosition( geometry.tl().x, geometry.tl().y);
+
+    target.draw( rectangle);
 }
 
 static gv::Node
@@ -30,11 +78,11 @@ DumpRecursive( gv::Graph& graph,
 
     const int kJsonIndent = 2;
     std::string widget_info = fmt::format( "{}", DumpInfo( obj).dump( kJsonIndent, ' ', true));
-    widget_info = std::regex_replace( widget_info, std::regex(R"(\n)"), "\\l");
-    widget_info = std::regex_replace( widget_info, std::regex(R"(<)"), "\\<");
-    widget_info = std::regex_replace( widget_info, std::regex(R"(>)"), "\\>");
 
-    std::fprintf( stderr, "Widget info: %s\n", widget_info.c_str());
+    widget_info = std::regex_replace( widget_info, std::regex{ R"(\n)"}, "\\n");
+    widget_info = std::regex_replace( widget_info, std::regex{ R"(>)"},  "\\>");
+    widget_info = std::regex_replace( widget_info, std::regex{ R"(<)"},  "\\<");
+
     const std::string label = fmt::format( "{{ Layout Object | address: {} | {} | {} }}",
                                             static_cast<const void*>( std::addressof( obj)),
                                             geometry_info,

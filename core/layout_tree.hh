@@ -10,24 +10,14 @@
 #include "../core/graphviz.hh"
 #include "../core/geometry.hh"
 #include "../core/debug.hh"
+#include "../core/dbg_info.hh"
 
-#include "nlohmann/json.hpp"
+#include "nlohmann/json_fwd.hpp"
 
 using Json = nlohmann::ordered_json;
 
 namespace xui
 {
-
-std::string Demangle( const char* mangled);
-
-template <typename T>
-Json
-DumpInfo( const T&)
-{
-    Json info{};
-    info["type"] = Demangle( typeid( T).name());
-    return info;
-}
 
 class LayoutObject final
 {
@@ -73,19 +63,19 @@ public:
         : geometry_{ geometry}
         , children_{}
         , widget_{ std::addressof( widget)}
-        , render_{ []( ObjectImpl* object,
-                       sf::RenderTarget& target,
-                       const Geometry& geometry )
+        , render_{ []( ObjectImpl* object__,
+                       sf::RenderTarget& target__,
+                       const Geometry& geometry__ )
                     {
-                        auto* tmp = static_cast<const T*>( object);
-                        Render( *tmp, geometry, target);
-                        drawOutline( target, geometry);
-                    }} /* RenderCall */
-        , dump_info_{ []( ObjectImpl* object)
+                        auto* tmp = static_cast<const T*>( object__);
+                        Render( *tmp, geometry__, target__);
+                        drawOutline( target__, geometry__);
+                    }}
+        , dump_info_{ []( ObjectImpl* object__)
                       {
                           $M( "Call dump_info_ Dump!!!\n");
-                          return DumpInfo( *static_cast<const T*>( object));
-                      }} /* DumpInfoCall */
+                          return DumpInfo( *static_cast<const T*>( object__));
+                      }}
     {
         children_.reserve( prealloc);
     }
@@ -97,45 +87,12 @@ public:
     {}
 
     friend void
-    Render( const LayoutObject& obj,
-            sf::RenderTarget& target)
-    {
-        obj.render_( obj.widget_, target, obj.geometry_);
-        for ( auto& child : obj.children_ )
-        {
-            Render( child, target);
-        }
-    }
+    Render( const LayoutObject& obj, sf::RenderTarget& target);
 
     friend Json
-    DumpInfo( const LayoutObject& obj,
-              int tree_depth = 0)
-    {
-        Json info = obj.dump_info_( obj.widget_);
+    DumpInfo( const LayoutObject& obj, int tree_depth);
 
-        if ( tree_depth )
-        {
-            Json child_info{};
-            for ( const auto& child : obj.children_ )
-            {
-                child_info.emplace_back( DumpInfo( child, tree_depth - 1));
-            }
-
-            info["children"] = std::move( child_info);
-        }
-
-        return info;
-    }
-
-    void
-    adjust()
-    {
-        for ( auto& child : children_ )
-        {
-            child.geometry_.translate( geometry_.tl());
-            child.adjust();
-        }
-    }
+    void adjust();
 
     template <typename OutputIt>
     void
@@ -172,19 +129,7 @@ public:
 
 private:
     static void
-    drawOutline( sf::RenderTarget& target,
-                 const Geometry& geometry)
-    {
-        sf::RectangleShape rectangle;
-
-        rectangle.setSize( sf::Vector2f{ geometry.size().x, geometry.size().y});
-        rectangle.setFillColor( sf::Color::Transparent);
-        rectangle.setOutlineColor( sf::Color::Red);
-        rectangle.setOutlineThickness( 1);
-        rectangle.setPosition( geometry.tl().x, geometry.tl().y);
-
-        target.draw( rectangle);
-    }
+    drawOutline( sf::RenderTarget& target, const Geometry& geometry);
 
 private:
     Geometry geometry_;
